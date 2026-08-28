@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+streamlit
+python-dotenv
+pydantic
+pydantic-settings
