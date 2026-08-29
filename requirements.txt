@@ -4,3 +4,7 @@ streamlit
 python-dotenv
 pydantic
 pydantic-settings
+PyMuPDF
+pytest
+httpx
+python-multipart

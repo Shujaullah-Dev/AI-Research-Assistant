@@ -1,10 +1,18 @@
 from fastapi import FastAPI
 
+from app.api.routes import router
+
+
 app = FastAPI(
     title="AI Research Assistant",
-    description="An AI-powered research assistant using Retrieval-Augmented Generation.",
+    description=(
+        "An AI-powered research assistant using "
+        "Retrieval-Augmented Generation."
+    ),
     version="0.1.0",
 )
+
+app.include_router(router)
 
 
 @app.get("/")
@@ -18,5 +26,5 @@ def root():
 @app.get("/health")
 def health_check():
     return {
-        "status": "healthy"
+        "status": "healthy",
     }
