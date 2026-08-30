@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
+*.py[cod]
 *$py.class
 
 # C extensions
@@ -57,6 +58,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.huggingface/
 nosetests.xml
 coverage.xml
 *.cover
@@ -230,3 +232,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+data/uploads/
+data/embeddings/
