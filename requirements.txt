@@ -8,3 +8,4 @@ PyMuPDF
 pytest
 httpx
 python-multipart
+sentence-transformers
