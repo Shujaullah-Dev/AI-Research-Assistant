@@ -236,3 +236,4 @@ __marimo__/
 
 data/uploads/
 data/embeddings/
+data/vector_store/
