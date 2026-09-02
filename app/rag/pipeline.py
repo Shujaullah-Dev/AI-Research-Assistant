@@ -1,17 +1,10 @@
-from dataclasses import dataclass
-
 from app.llm.ollama_client import OllamaLLM
+from app.rag.models import RAGResponse
 from app.retrieval.retriever import RetrievedChunk, Retriever
 
 
-@dataclass
-class RAGResponse:
-    answer: str
-    sources: list[RetrievedChunk]
-
-
 class RAGPipeline:
-    """Retrieve relevant chunks and generate an answer."""
+    """Retrieve relevant chunks and generate a grounded answer."""
 
     def __init__(
         self,
@@ -39,13 +32,15 @@ class RAGPipeline:
         if not sources:
             return RAGResponse(
                 answer=(
-                    "I could not find relevant information "
-                    "in the provided documents."
+                    "I could not find enough relevant "
+                    "information in the provided documents."
                 ),
-                sources=[],
+                citations=[],
             )
 
-        context = self._build_context(sources)
+        context = self._build_context(
+            sources
+        )
 
         prompt = self._build_prompt(
             question=question,
@@ -54,9 +49,9 @@ class RAGPipeline:
 
         answer = self.llm.generate(prompt)
 
-        return RAGResponse(
+        return RAGResponse.from_retrieved_chunks(
             answer=answer,
-            sources=sources,
+            chunks=sources,
         )
 
     @staticmethod
@@ -75,6 +70,8 @@ class RAGPipeline:
                 f"[Source {index}]\n"
                 f"Document: {metadata.document_name}\n"
                 f"Page: {metadata.page_number}\n"
+                f"Chunk ID: {metadata.chunk_id}\n"
+                f"Similarity: {source.score:.4f}\n"
                 f"Text: {metadata.text}"
             )
 
@@ -88,14 +85,20 @@ class RAGPipeline:
         return f"""
 You are an AI research assistant.
 
-Answer the user's question using ONLY the
-provided research context.
+Your job is to answer the user's question
+using ONLY the provided research context.
 
-If the answer cannot be determined from
-the context, say that the information is
-not available in the provided documents.
+Important rules:
 
-Do not invent facts.
+1. Do not invent facts.
+2. Do not use outside knowledge.
+3. If the context does not contain enough
+   information to answer the question,
+   clearly say so.
+4. When making a factual claim, include
+   the corresponding source number such as
+   [Source 1] or [Source 2].
+5. Keep the answer concise and precise.
 
 Research context:
 
@@ -105,5 +108,5 @@ User question:
 
 {question}
 
-Answer clearly and concisely.
+Answer:
 """.strip()
