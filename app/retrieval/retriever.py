@@ -20,9 +20,16 @@ class Retriever:
         self,
         embedding_service: EmbeddingService,
         vector_store: FAISSVectorStore,
+        similarity_threshold: float = 0.0,
     ) -> None:
+        if not 0.0 <= similarity_threshold <= 1.0:
+            raise ValueError(
+                "similarity_threshold must be between 0 and 1"
+            )
+
         self.embedding_service = embedding_service
         self.vector_store = vector_store
+        self.similarity_threshold = similarity_threshold
 
     def retrieve(
         self,
@@ -33,7 +40,9 @@ class Retriever:
             raise ValueError("query must not be empty")
 
         if top_k <= 0:
-            raise ValueError("top_k must be greater than 0")
+            raise ValueError(
+                "top_k must be greater than 0"
+            )
 
         query_embedding = self.embedding_service.embed(
             [query]
@@ -44,10 +53,16 @@ class Retriever:
             top_k=top_k,
         )
 
+        filtered_results = [
+            (metadata, score)
+            for metadata, score in results
+            if score >= self.similarity_threshold
+        ]
+
         return [
             RetrievedChunk(
                 metadata=metadata,
                 score=score,
             )
-            for metadata, score in results
+            for metadata, score in filtered_results
         ]

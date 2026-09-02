@@ -1,5 +1,6 @@
 from app.embeddings.service import EmbeddingService
 from app.llm.ollama_client import OllamaLLM
+from app.rag.citations import format_citations
 from app.rag.pipeline import RAGPipeline
 from app.retrieval.retriever import Retriever
 from app.vector_store.faiss_store import FAISSVectorStore
@@ -19,6 +20,7 @@ def main():
     retriever = Retriever(
         embedding_service=embedding_service,
         vector_store=vector_store,
+        similarity_threshold=0.40,
     )
 
     llm = OllamaLLM(
@@ -52,16 +54,13 @@ def main():
             print("\nAnswer:")
             print(response.answer)
 
-            print("\nSources:")
+            print()
 
-            for source in response.sources:
-                metadata = source.metadata
-
-                print(
-                    f"- {metadata.document_name}, "
-                    f"page {metadata.page_number}, "
-                    f"score={source.score:.4f}"
+            print(
+                format_citations(
+                    response.citations
                 )
+            )
 
             print()
 

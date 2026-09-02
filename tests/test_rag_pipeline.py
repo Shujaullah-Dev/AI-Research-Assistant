@@ -31,7 +31,10 @@ class FakeLLM:
 
     def generate(self, prompt: str) -> str:
         self.last_prompt = prompt
-        return "The model was trained using CIFAR-10."
+        return (
+            "The model was trained using "
+            "CIFAR-10 [Source 1]."
+        )
 
 
 def test_rag_pipeline_generates_answer():
@@ -49,15 +52,18 @@ def test_rag_pipeline_generates_answer():
 
     assert (
         response.answer
-        == "The model was trained using CIFAR-10."
+        == "The model was trained using "
+        "CIFAR-10 [Source 1]."
     )
 
-    assert len(response.sources) == 1
+    assert len(response.citations) == 1
 
-    assert (
-        response.sources[0].metadata.page_number
-        == 7
-    )
+    citation = response.citations[0]
+
+    assert citation.source_id == 1
+    assert citation.page_number == 7
+    assert citation.chunk_id == 1
+    assert citation.document_name == "paper.pdf"
 
 
 def test_rag_prompt_contains_context():
@@ -76,10 +82,33 @@ def test_rag_prompt_contains_context():
     assert llm.last_prompt is not None
 
     assert "CIFAR-10" in llm.last_prompt
-
     assert "paper.pdf" in llm.last_prompt
-
     assert "Page: 7" in llm.last_prompt
+    assert "[Source 1]" in llm.last_prompt
+
+
+def test_rag_returns_no_citations_without_sources():
+    class EmptyRetriever:
+        def retrieve(
+            self,
+            query: str,
+            top_k: int = 5,
+        ):
+            return []
+
+    llm = FakeLLM()
+
+    pipeline = RAGPipeline(
+        retriever=EmptyRetriever(),
+        llm=llm,
+    )
+
+    response = pipeline.answer(
+        "What dataset was used?"
+    )
+
+    assert response.citations == []
+    assert "could not find" in response.answer.lower()
 
 
 def test_empty_question_raises_error():
