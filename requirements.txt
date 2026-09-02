@@ -10,3 +10,4 @@ httpx
 python-multipart
 sentence-transformers
 faiss-cpu
+ollama
