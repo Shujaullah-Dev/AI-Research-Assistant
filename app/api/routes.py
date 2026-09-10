@@ -4,23 +4,22 @@ from pathlib import Path
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
+from app.chunking.chunker import TextChunker
 from app.embeddings.service import EmbeddingService
 from app.ingestion.service import IngestionService
 from app.llm.ollama_client import OllamaLLM
 from app.rag.pipeline import RAGPipeline
 from app.retrieval.reranker import CrossEncoderReranker
 from app.retrieval.retriever import Retriever
-from app.vector_store.faiss_store import FAISSVectorStore
+from app.vector_store.faiss_store import ChunkMetadata, FAISSVectorStore
 
 
 router = APIRouter()
 
-ingestion_service = IngestionService()
 
-
-# ---------------------------------------------------------------------------
+# -------------------------------------------------------------------
 # Configuration
-# ---------------------------------------------------------------------------
+# -------------------------------------------------------------------
 
 EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 RERANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
@@ -28,14 +27,30 @@ VECTOR_STORE_DIRECTORY = "data/vector_store_bge"
 LLM_MODEL = "llama3.2:3b"
 RERANKER_THRESHOLD = 0.0
 
+UPLOAD_DIRECTORY = Path("data/uploads")
+MAX_UPLOAD_SIZE = 20 * 1024 * 1024 # 20MB
 
-# ---------------------------------------------------------------------------
+CHUNK_SIZE = 500
+CHUNK_OVERLAP = 50
+
+
+# -------------------------------------------------------------------
+# Services
+# -------------------------------------------------------------------
+
+ingestion_service = IngestionService()
+
+chunker = TextChunker(
+    chunk_size=CHUNK_SIZE,
+    chunk_overlap=CHUNK_OVERLAP,
+)
+
+
+# -------------------------------------------------------------------
 # Request / response models
-# ---------------------------------------------------------------------------
+# -------------------------------------------------------------------
 
 class AskRequest(BaseModel):
-    """Request body for the /ask endpoint."""
-
     question: str = Field(
         ...,
         min_length=1,
@@ -44,14 +59,12 @@ class AskRequest(BaseModel):
             "What is the main contribution of this research paper?"
         ],
     )
-
     top_k: int = Field(
         default=5,
         ge=1,
         le=20,
         description="Number of chunks retrieved before reranking.",
     )
-
     final_k: int = Field(
         default=5,
         ge=1,
@@ -61,8 +74,6 @@ class AskRequest(BaseModel):
 
 
 class CitationResponse(BaseModel):
-    """Citation information returned with an answer."""
-
     source_id: int
     document_name: str
     page_number: int
@@ -71,29 +82,36 @@ class CitationResponse(BaseModel):
 
 
 class AskResponse(BaseModel):
-    """Response returned by the /ask endpoint."""
-
     answer: str
     citations: list[CitationResponse]
 
 
-# ---------------------------------------------------------------------------
-# RAG pipeline
-# ---------------------------------------------------------------------------
+# -------------------------------------------------------------------
+# Cached shared services
+# -------------------------------------------------------------------
 
 @lru_cache(maxsize=1)
-def get_pipeline() -> RAGPipeline:
-    """Create and cache the RAG pipeline."""
-
+def get_embedding_service() -> EmbeddingService:
     print("Loading embedding service...")
-    embedding_service = EmbeddingService(
+
+    return EmbeddingService(
         model_name=EMBEDDING_MODEL
     )
 
+
+@lru_cache(maxsize=1)
+def get_vector_store() -> FAISSVectorStore:
     print("Loading BGE vector store...")
-    vector_store = FAISSVectorStore.load(
+
+    return FAISSVectorStore.load(
         VECTOR_STORE_DIRECTORY
     )
+
+
+@lru_cache(maxsize=1)
+def get_pipeline() -> RAGPipeline:
+    embedding_service = get_embedding_service()
+    vector_store = get_vector_store()
 
     retriever = Retriever(
         embedding_service=embedding_service,
@@ -102,11 +120,13 @@ def get_pipeline() -> RAGPipeline:
     )
 
     print("Loading cross-encoder reranker...")
+
     reranker = CrossEncoderReranker(
         model_name=RERANKER_MODEL
     )
 
     print("Loading Ollama LLM...")
+
     llm = OllamaLLM(
         model=LLM_MODEL
     )
@@ -119,16 +139,14 @@ def get_pipeline() -> RAGPipeline:
     )
 
 
-# ---------------------------------------------------------------------------
-# Document upload endpoint
-# ---------------------------------------------------------------------------
+# -------------------------------------------------------------------
+# Document upload + indexing
+# -------------------------------------------------------------------
 
 @router.post("/documents/upload")
 async def upload_document(
     file: UploadFile = File(...)
 ):
-    """Upload and process a PDF document."""
-
     if not file.filename:
         raise HTTPException(
             status_code=400,
@@ -141,39 +159,149 @@ async def upload_document(
             detail="Only PDF files are supported.",
         )
 
-    upload_dir = Path("data/uploads")
-    upload_dir.mkdir(
+    # Keep only the filename itself.
+    safe_filename = Path(file.filename).name
+
+    UPLOAD_DIRECTORY.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    file_path = upload_dir / file.filename
+    file_path = UPLOAD_DIRECTORY / safe_filename
+
+    # ---------------------------------------------------------------
+    # 1. Save uploaded PDF
+    # ---------------------------------------------------------------
 
     content = await file.read()
+
+    if not content:
+        raise HTTPException(
+            status_code=400,
+            detail="The uploaded PDF is empty.",
+        )
+
+    if len(content) > MAX_UPLOAD_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail="The uploaded PDF is too large. Maximum size is 20MB.",
+        )
+
     file_path.write_bytes(content)
 
-    pages = ingestion_service.ingest_pdf(
-        file_path
-    )
+    # ---------------------------------------------------------------
+    # 2. Extract pages
+    # ---------------------------------------------------------------
+
+    try:
+        pages = ingestion_service.ingest_pdf(file_path)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to process PDF: {exc}",
+        ) from exc
+
+    if not pages:
+        raise HTTPException(
+            status_code=400,
+            detail="No readable pages were found in the PDF.",
+        )
+
+    # ---------------------------------------------------------------
+    # 3. Convert pages into chunks
+    # ---------------------------------------------------------------
+
+    chunks = []
+    chunk_counter = 0
+
+    for page in pages:
+        page_chunks = chunker.chunk_page(
+            text=page.text,
+            page_number=page.page_number,
+        )
+
+        for chunk in page_chunks:
+            chunks.append(
+                ChunkMetadata(
+                    chunk_id=chunk_counter,
+                    page_number=chunk.page_number,
+                    text=chunk.text,
+                    document_name=page.document_name,
+                )
+            )
+
+            chunk_counter += 1
+
+    if not chunks:
+        raise HTTPException(
+            status_code=400,
+            detail="No text chunks could be created from the PDF.",
+        )
+
+    # ---------------------------------------------------------------
+    # 4. Create BGE embeddings
+    # ---------------------------------------------------------------
+
+    embedding_service = get_embedding_service()
+
+    texts = [
+        chunk.text
+        for chunk in chunks
+    ]
+
+    try:
+        embeddings = embedding_service.embed(texts)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to create embeddings: {exc}",
+        ) from exc
+
+    # ---------------------------------------------------------------
+    # 5. Add chunks + embeddings to FAISS
+    # ---------------------------------------------------------------
+
+    vector_store = get_vector_store()
+
+    try:
+        vector_store.add(
+            embeddings=embeddings,
+            metadata=chunks,
+        )
+
+        vector_store.save(
+            VECTOR_STORE_DIRECTORY
+        )
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to update vector store: {exc}",
+        ) from exc
+
+    # ---------------------------------------------------------------
+    # 6. Return indexing information
+    # ---------------------------------------------------------------
 
     return {
-        "document_name": file.filename,
+        "document_name": safe_filename,
         "pages_extracted": len(pages),
+        "chunks_indexed": len(chunks),
+        "embedding_model": EMBEDDING_MODEL,
+        "vector_store": VECTOR_STORE_DIRECTORY,
         "status": "processed",
     }
 
 
-# ---------------------------------------------------------------------------
-# Ask endpoint
-# ---------------------------------------------------------------------------
+# -------------------------------------------------------------------
+# Question answering
+# -------------------------------------------------------------------
 
 @router.post(
     "/ask",
     response_model=AskResponse,
 )
 def ask(request: AskRequest) -> AskResponse:
-    """Answer a research question using the RAG pipeline."""
-
     try:
         pipeline = get_pipeline()
 
