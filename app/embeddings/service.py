@@ -9,6 +9,7 @@ class EmbeddingService:
         model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
         model=None,
     ) -> None:
+        self.model_name = model_name
         self.model = model or SentenceTransformer(model_name)
 
     @property
