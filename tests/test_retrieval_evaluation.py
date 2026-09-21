@@ -1,5 +1,6 @@
-from app.embeddings.service import EmbeddingService
-from app.vector_store.faiss_store import FAISSVectorStore
+from tests.retrieval_test_helpers import (
+    retrieval_test_components,
+)
 
 
 EVALUATION_CASES = [
@@ -50,29 +51,20 @@ EVALUATION_CASES = [
 ]
 
 
-def load_retrieval_components():
-    embedding_service = EmbeddingService()
+def test_retrieval_evaluation(
+    retrieval_test_components,
+):
+    """
+    Evaluate retrieval using a temporary CI-safe index.
+    """
 
-    # vector_store = FAISSVectorStore.load(
-    #     "data/vector_store"
-    # )
-    vector_store = FAISSVectorStore.load(
-    "data/vector_store_bge"
-        )
-
-    return embedding_service, vector_store
-
-
-def test_retrieval_evaluation():
-    embedding_service, vector_store = load_retrieval_components()
+    embedding_service, vector_store = (
+        retrieval_test_components
+    )
 
     top_1_correct = 0
     top_3_correct = 0
     reciprocal_ranks = []
-
-    print("\n" + "=" * 80)
-    print("RETRIEVAL EVALUATION")
-    print("=" * 80)
 
     for case in EVALUATION_CASES:
         question = case["question"]
@@ -101,6 +93,7 @@ def test_retrieval_evaluation():
             )
 
             reciprocal_rank = 1 / rank
+
         else:
             rank = None
             reciprocal_rank = 0.0
@@ -159,36 +152,25 @@ def test_retrieval_evaluation():
 
     top_1_accuracy = top_1_correct / total
     top_3_accuracy = top_3_correct / total
+
     mean_reciprocal_rank = (
         sum(reciprocal_ranks) / total
     )
 
     print("\n" + "=" * 80)
-    print("SUMMARY")
+    print("RETRIEVAL EVALUATION")
     print("=" * 80)
 
     print(
-        f"Total questions: {total}"
-    )
-
-    print(
-        f"Top-1 correct: "
-        f"{top_1_correct}/{total}"
-    )
-
-    print(
         f"Top-1 accuracy: "
-        f"{top_1_accuracy:.2%}"
-    )
-
-    print(
-        f"Top-3 correct: "
-        f"{top_3_correct}/{total}"
+        f"{top_1_correct}/{total} "
+        f"= {top_1_accuracy:.2%}"
     )
 
     print(
         f"Top-3 accuracy: "
-        f"{top_3_accuracy:.2%}"
+        f"{top_3_correct}/{total} "
+        f"= {top_3_accuracy:.2%}"
     )
 
     print(

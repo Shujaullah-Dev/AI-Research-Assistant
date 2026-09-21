@@ -2,7 +2,9 @@ from app.embeddings.service import EmbeddingService
 from app.retrieval.reranker import CrossEncoderReranker
 from app.retrieval.retriever import Retriever
 from app.vector_store.faiss_store import FAISSVectorStore
-
+from tests.retrieval_test_helpers import (
+    retrieval_test_components,
+)
 
 MODEL_NAME = "BAAI/bge-small-en-v1.5"
 RERANKER_NAME = "cross-encoder/ms-marco-MiniLM-L-6-v2"
@@ -57,15 +59,15 @@ EVALUATION_CASES = [
 ]
 
 
-def test_reranking_top_1_accuracy():
-    """Every evaluation question should retrieve the correct chunk at rank 1."""
+def test_reranking_top_1_accuracy(
+    retrieval_test_components,
+):
+    """
+    Evaluate reranking using the temporary CI index.
+    """
 
-    embedding_service = EmbeddingService(
-        model_name=MODEL_NAME
-    )
-
-    vector_store = FAISSVectorStore.load(
-        INDEX_DIRECTORY
+    embedding_service, vector_store = (
+        retrieval_test_components
     )
 
     retriever = Retriever(
@@ -93,19 +95,27 @@ def test_reranking_top_1_accuracy():
         )
 
         assert reranked_chunks, (
-            f"No chunks were returned for question: {question}"
+            f"No chunks were returned for question: "
+            f"{question}"
         )
 
         top_chunk = reranked_chunks[0].chunk
 
-        if top_chunk.metadata.chunk_id == expected_chunk_id:
+        if (
+            top_chunk.metadata.chunk_id
+            == expected_chunk_id
+        ):
             correct += 1
+
         else:
             print("\nFAILED QUESTION:")
             print(question)
+
             print(
-                f"Expected chunk: {expected_chunk_id}"
+                f"Expected chunk: "
+                f"{expected_chunk_id}"
             )
+
             print(
                 f"Retrieved chunk: "
                 f"{top_chunk.metadata.chunk_id}"
@@ -116,6 +126,7 @@ def test_reranking_top_1_accuracy():
     print("\n" + "=" * 70)
     print("RERANKING EVALUATION")
     print("=" * 70)
+
     print(
         f"Top-1 accuracy: "
         f"{correct}/{len(EVALUATION_CASES)} "
