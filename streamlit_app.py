@@ -1,3 +1,4 @@
+import uuid
 import time
 from datetime import datetime
 
@@ -414,6 +415,9 @@ st.markdown(
 # Session state initialization
 # -------------------------------------------------------------------
 
+if "session_id" not in st.session_state:
+    st.session_state["session_id"] = str(uuid.uuid4())
+
 if "uploaded_document" not in st.session_state:
     st.session_state["uploaded_document"] = None
 
@@ -430,6 +434,15 @@ if "qa_history" not in st.session_state:
 if "question_input" not in st.session_state:
     st.session_state["question_input"] = ""
 
+def get_session_id():
+    
+    """
+    Return the unique identifier for the current
+    Streamlit session.
+    """
+    return st.session_state["session_id"]
+
+session_id = get_session_id()
 
 # -------------------------------------------------------------------
 # API helper functions
@@ -449,10 +462,14 @@ def upload_document(uploaded_file):
             "application/pdf",
         )
     }
+    data = {
+        "session_id": get_session_id(),
+    }
 
     response = requests.post(
         UPLOAD_ENDPOINT,
         files=files,
+        data=data,
         timeout=300,
     )
 
@@ -466,6 +483,7 @@ def ask_question(question):
 
     payload = {
         "question": question,
+        "session_id": get_session_id(),
         "top_k": 5,
         "final_k": 5,
     }
@@ -530,7 +548,14 @@ def render_sidebar():
             unsafe_allow_html=True,
         )
 
-        st.divider()
+        # st.divider()
+
+        # st.caption("Current session")
+
+        # st.code(
+            # get_session_id(),
+            # language=None,
+        # )
 
         # ---------------------------------------------------------
         # Backend status
