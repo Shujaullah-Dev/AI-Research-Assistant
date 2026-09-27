@@ -1,7 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form,HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
 from app.chunking.chunker import TextChunker
@@ -12,6 +12,7 @@ from app.rag.pipeline import RAGPipeline
 from app.retrieval.reranker import CrossEncoderReranker
 from app.retrieval.retriever import Retriever
 from app.vector_store.faiss_store import ChunkMetadata, FAISSVectorStore
+from app.storage.session_storage import SessionStorage
 
 
 router = APIRouter()
@@ -27,7 +28,7 @@ VECTOR_STORE_DIRECTORY = "data/vector_store_bge"
 LLM_MODEL = "llama3.2:3b"
 RERANKER_THRESHOLD = 0.0
 
-UPLOAD_DIRECTORY = Path("data/uploads")
+# UPLOAD_DIRECTORY = Path("data/uploads")
 MAX_UPLOAD_SIZE = 20 * 1024 * 1024 # 20MB
 
 CHUNK_SIZE = 500
@@ -59,6 +60,13 @@ class AskRequest(BaseModel):
             "What is the main contribution of this research paper?"
         ],
     )
+
+    session_id: str = Field(
+
+       min_length=1,
+
+    )
+
     top_k: int = Field(
         default=5,
         ge=1,
@@ -98,20 +106,58 @@ def get_embedding_service() -> EmbeddingService:
         model_name=EMBEDDING_MODEL
     )
 
-
 @lru_cache(maxsize=1)
-def get_vector_store() -> FAISSVectorStore:
-    print("Loading BGE vector store...")
-
-    return FAISSVectorStore.load(
-        VECTOR_STORE_DIRECTORY
+def get_reranker() -> CrossEncoderReranker:
+    return CrossEncoderReranker(
+        model_name=RERANKER_MODEL,
     )
 
 
 @lru_cache(maxsize=1)
-def get_pipeline() -> RAGPipeline:
+def get_llm() -> OllamaLLM:
+    return OllamaLLM(
+        model=LLM_MODEL,
+    )
+
+
+@lru_cache(maxsize=1)
+def get_session_vector_store(
+    session_id: str,
+) -> FAISSVectorStore:
+
+
+    session_storage = SessionStorage(
+        session_id=session_id,
+    )
+
+    session_storage.create_directories()
+
+    vector_store_directory = (
+        session_storage.vector_store_directory
+    )
+
+    index_path = vector_store_directory / "index.faiss"
+    metadata_file = vector_store_directory / "metadata.json"
+
+    if index_path.exists() and metadata_file.exists():
+        return FAISSVectorStore.load(
+            str(vector_store_directory)
+        )
+
     embedding_service = get_embedding_service()
-    vector_store = get_vector_store()
+
+    return FAISSVectorStore(
+        dimension=embedding_service.dimension,
+    )
+
+
+def get_session_pipeline(
+    session_id:str,
+) -> RAGPipeline:
+    embedding_service = get_embedding_service()
+    vector_store = get_session_vector_store(
+        session_id = session_id,
+    )
 
     retriever = Retriever(
         embedding_service=embedding_service,
@@ -121,15 +167,11 @@ def get_pipeline() -> RAGPipeline:
 
     print("Loading cross-encoder reranker...")
 
-    reranker = CrossEncoderReranker(
-        model_name=RERANKER_MODEL
-    )
+    reranker = get_reranker()
 
     print("Loading Ollama LLM...")
 
-    llm = OllamaLLM(
-        model=LLM_MODEL
-    )
+    llm = get_llm()
 
     return RAGPipeline(
         retriever=retriever,
@@ -145,8 +187,15 @@ def get_pipeline() -> RAGPipeline:
 
 @router.post("/documents/upload")
 async def upload_document(
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    session_id: str = Form(...),
 ):
+    session_storage = SessionStorage(
+        session_id=session_id,
+    )
+
+    session_storage.create_directories()
+
     if not file.filename:
         raise HTTPException(
             status_code=400,
@@ -162,12 +211,17 @@ async def upload_document(
     # Keep only the filename itself.
     safe_filename = Path(file.filename).name
 
-    UPLOAD_DIRECTORY.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
+    # UPLOAD_DIRECTORY.mkdir(
+    #     parents=True,
+    #     exist_ok=True,
+    # )
 
-    file_path = UPLOAD_DIRECTORY / safe_filename
+    # file_path = UPLOAD_DIRECTORY / safe_filename
+
+    file_path = (
+        session_storage.upload_directory 
+        / safe_filename
+    )
 
     # ---------------------------------------------------------------
     # 1. Save uploaded PDF
@@ -261,7 +315,9 @@ async def upload_document(
     # 5. Add chunks + embeddings to FAISS
     # ---------------------------------------------------------------
 
-    vector_store = get_vector_store()
+    vector_store = get_session_vector_store(
+        session_id = session_id,
+    )
 
     try:
         vector_store.add(
@@ -270,7 +326,7 @@ async def upload_document(
         )
 
         vector_store.save(
-            VECTOR_STORE_DIRECTORY
+            str(session_storage.vector_store_directory)
         )
 
     except Exception as exc:
@@ -303,7 +359,9 @@ async def upload_document(
 )
 def ask(request: AskRequest) -> AskResponse:
     try:
-        pipeline = get_pipeline()
+        pipeline = get_session_pipeline(
+            session_id = request.session_id,
+        )
 
         response = pipeline.answer(
             question=request.question,

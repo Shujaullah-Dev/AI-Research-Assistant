@@ -34,6 +34,7 @@ def test_upload_rejects_non_pdf(tmp_path):
                     "text/plain",
                 )
             },
+            data={"session_id": "test_session_123"},
         )
 
     assert response.status_code == 400

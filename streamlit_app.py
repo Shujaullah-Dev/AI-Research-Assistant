@@ -462,10 +462,14 @@ def upload_document(uploaded_file):
             "application/pdf",
         )
     }
+    data = {
+        "session_id": get_session_id(),
+    }
 
     response = requests.post(
         UPLOAD_ENDPOINT,
         files=files,
+        data=data,
         timeout=300,
     )
 
@@ -479,6 +483,7 @@ def ask_question(question):
 
     payload = {
         "question": question,
+        "session_id": get_session_id(),
         "top_k": 5,
         "final_k": 5,
     }
@@ -543,14 +548,14 @@ def render_sidebar():
             unsafe_allow_html=True,
         )
 
-        st.divider()
+        # st.divider()
 
-        st.caption("Current session")
+        # st.caption("Current session")
 
-        st.code(
-            get_session_id(),
-            language=None,
-        )
+        # st.code(
+            # get_session_id(),
+            # language=None,
+        # )
 
         # ---------------------------------------------------------
         # Backend status
