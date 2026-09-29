@@ -173,15 +173,17 @@ The response contains the generated answer together with source citations.
 Example:
 
 ```
+Example:
+
 {
-  "answer": "The researchers trained the model using the CIFAR-10 dataset.",
+  "answer": "The model uses a transformer architecture with self-attention.",
   "citations": [
     {
       "source_id": "0",
-      "document_name": "demo_paper.pdf",
-      "page_number": 1,
-      "chunk_id": 0,
-      "score": 0.8
+      "document_name": "research_paper.pdf",
+      "page_number": 3,
+      "chunk_id": 12,
+      "score": 0.87
     }
   ]
 }
