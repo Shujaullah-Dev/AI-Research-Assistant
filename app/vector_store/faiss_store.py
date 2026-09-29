@@ -57,6 +57,55 @@ class FAISSVectorStore:
         self.index.add(vectors)
         self.metadata.extend(metadata)
 
+    def remove_document(self, document_name: str) -> int:
+        """Remove all chunks belonging to a document.
+
+        The FAISS index and metadata list use matching positions, so the
+        index must be rebuilt when document chunks are removed.
+
+        Returns:
+            Number of removed chunks.
+        """
+        if not document_name:
+            raise ValueError("document_name cannot be empty")
+
+        keep_indices = [
+            index
+            for index, item in enumerate(self.metadata)
+            if item.document_name != document_name
+        ]
+
+        removed_count = len(self.metadata) - len(keep_indices)
+
+        if removed_count == 0:
+            return 0
+
+        if keep_indices:
+            retained_vectors = np.vstack(
+                [
+                    self.index.reconstruct(index)
+                    for index in keep_indices
+                ]
+            ).astype(np.float32)
+        else:
+            retained_vectors = np.empty(
+                (0, self.dimension),
+                dtype=np.float32,
+            )
+
+        new_index = faiss.IndexFlatIP(self.dimension)
+
+        if len(retained_vectors) > 0:
+            new_index.add(retained_vectors)
+
+        self.index = new_index
+        self.metadata = [
+            self.metadata[index]
+            for index in keep_indices
+        ]
+
+        return removed_count
+
     def search(
         self,
         query_embedding: list[float],

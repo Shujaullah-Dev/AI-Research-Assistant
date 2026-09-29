@@ -47,6 +47,7 @@ def test_add_and_search():
     assert len(results) == 2
     assert results[0][0].chunk_id == 0
 
+
 def test_search_returns_metadata():
     store = FAISSVectorStore(dimension=2)
 
@@ -77,6 +78,7 @@ def test_search_returns_metadata():
     assert metadata.document_name == "research.pdf"
     assert score > 0.99
 
+
 import pytest
 
 
@@ -95,6 +97,7 @@ def test_dimension_mismatch_raises_error():
                 )
             ],
         )
+
 
 def test_store_can_be_saved_and_loaded(tmp_path):
     store = FAISSVectorStore(dimension=2)
@@ -122,3 +125,59 @@ def test_store_can_be_saved_and_loaded(tmp_path):
 
     assert len(results) == 1
     assert results[0][0].text == "Saved chunk."
+
+
+def test_remove_document_preserves_other_documents():
+    store = FAISSVectorStore(dimension=2)
+
+    store.add(
+        [
+            [1.0, 0.0],
+            [0.9, 0.1],
+            [0.0, 1.0],
+        ],
+        [
+            ChunkMetadata(
+                chunk_id=0,
+                page_number=1,
+                text="Old document content.",
+                document_name="paper-a.pdf",
+            ),
+            ChunkMetadata(
+                chunk_id=1,
+                page_number=2,
+                text="More old document content.",
+                document_name="paper-a.pdf",
+            ),
+            ChunkMetadata(
+                chunk_id=2,
+                page_number=1,
+                text="Other document content.",
+                document_name="paper-b.pdf",
+            ),
+        ],
+    )
+
+    removed_count = store.remove_document("paper-a.pdf")
+
+    assert removed_count == 2
+    assert len(store.metadata) == 1
+    assert store.metadata[0].document_name == "paper-b.pdf"
+    assert store.metadata[0].text == "Other document content."
+
+    results = store.search(
+        [0.0, 1.0],
+        top_k=5,
+    )
+
+    assert len(results) == 1
+    assert results[0][0].document_name == "paper-b.pdf"
+    assert results[0][0].text == "Other document content."
+
+    old_document_results = store.search(
+        [1.0, 0.0],
+        top_k=5,
+    )
+
+    assert len(old_document_results) == 1
+    assert old_document_results[0][0].document_name == "paper-b.pdf"

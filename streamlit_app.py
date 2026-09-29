@@ -626,10 +626,12 @@ def render_sidebar():
                 use_container_width=True,
                 help="Clear the current document and question history",
             ):
+                st.session_state["session_id"] = str(uuid.uuid4())
                 st.session_state["uploaded_document"] = None
                 st.session_state["last_answer"] = None
                 st.session_state["last_citations"] = []
                 st.session_state["qa_history"] = []
+                st.session_state["question_input"] = ""
                 st.rerun()
 
         st.divider()
