@@ -48,28 +48,45 @@ st.markdown(
     @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 
     :root {
-        --ink: #1C2230;
-        --ink-soft: #5B6472;
-        --paper: #FAF9F4;
-        --paper-raised: #FFFFFF;
-        --line: #DEDACB;
-        --accent: #A8672A;
-        --accent-soft: rgba(168, 103, 42, 0.10);
-        --teal: #2E5C55;
-        --teal-soft: rgba(46, 92, 85, 0.10);
-        --brick: #9A4433;
-        --brick-soft: rgba(154, 68, 51, 0.10);
-        --font-serif: 'Newsreader', Georgia, serif;
-        --font-sans: 'IBM Plex Sans', -apple-system, sans-serif;
+        --ink: #1A1F2B;
+        --ink-soft: #4A5568;
+        --paper: #F7F4EC;
+        --paper-raised: #FFFEFA;
+        --line: #D6D0C0;
+        --accent: #9A5A1F;
+        --accent-soft: rgba(154, 90, 31, 0.12);
+        --teal: #1F5A52;
+        --teal-soft: rgba(31, 90, 82, 0.12);
+        --brick: #8B3A2C;
+        --brick-soft: rgba(139, 58, 44, 0.12);
+        --info-bg: #E8F1F0;
+        --info-ink: #1F5A52;
+        --info-border: #2E7A6E;
+        --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+        --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    html, body, [class*="css"] {
+    /* Force light reading-room theme even if OS prefers dark */
+    html, body, [data-testid="stAppViewContainer"],
+    [data-testid="stHeader"], .stApp, .stApp > header {
+        background-color: var(--paper) !important;
+        color: var(--ink) !important;
+    }
+
+    html, body, [class*="css"], p, span, label, li, div {
         font-family: var(--font-sans);
-        color: var(--ink);
     }
 
     .stApp {
-        background: var(--paper);
+        background:
+            radial-gradient(ellipse 80% 50% at 100% -10%, rgba(154, 90, 31, 0.06), transparent 50%),
+            radial-gradient(ellipse 60% 40% at 0% 100%, rgba(31, 90, 82, 0.05), transparent 45%),
+            var(--paper) !important;
+        color: var(--ink) !important;
+    }
+
+    [data-testid="stHeader"] {
+        background: transparent !important;
     }
 
     /* -------------------------------------------------------------
@@ -77,9 +94,9 @@ st.markdown(
     ------------------------------------------------------------- */
 
     .block-container {
-        padding-top: 1.5rem;
+        padding-top: 1.75rem;
         padding-bottom: 4rem;
-        max-width: 1180px;
+        max-width: 1080px;
     }
 
     /* -------------------------------------------------------------
@@ -87,40 +104,44 @@ st.markdown(
     ------------------------------------------------------------- */
 
     @keyframes settle {
-        from { opacity: 0; transform: translateY(6px); }
+        from { opacity: 0; transform: translateY(8px); }
         to   { opacity: 1; transform: translateY(0); }
     }
 
     .masthead {
-        padding: 0.75rem 0 1.4rem 0;
-        border-bottom: 2px solid var(--ink);
-        margin-bottom: 0.5rem;
-        animation: settle 0.5s ease-out;
+        padding: 0.5rem 0 1.5rem 0;
+        border-bottom: 2.5px solid var(--ink);
+        margin-bottom: 1.25rem;
+        animation: settle 0.55s ease-out;
     }
 
     .masthead-kicker {
-        font-family: var(--font-sans);
-        font-size: 0.8rem;
-        font-weight: 500;
-        color: var(--accent);
-        margin-bottom: 0.35rem;
+        font-family: var(--font-sans) !important;
+        font-size: 0.78rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--accent) !important;
+        margin-bottom: 0.45rem !important;
     }
 
     .masthead-title {
-        font-family: var(--font-serif);
-        font-size: 2.75rem;
-        font-weight: 500;
-        line-height: 1.1;
-        letter-spacing: -0.01em;
-        margin-bottom: 0.4rem;
+        font-family: var(--font-serif) !important;
+        font-size: 2.85rem !important;
+        font-weight: 600 !important;
+        line-height: 1.08 !important;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.45rem !important;
+        color: var(--ink) !important;
     }
 
     .masthead-subtitle {
-        font-family: var(--font-serif);
-        font-style: italic;
-        font-size: 1.15rem;
-        color: var(--ink-soft);
-        max-width: 46ch;
+        font-family: var(--font-serif) !important;
+        font-style: italic !important;
+        font-size: 1.18rem !important;
+        color: var(--ink-soft) !important;
+        max-width: 48ch;
+        line-height: 1.45;
     }
 
     /* -------------------------------------------------------------
@@ -128,19 +149,41 @@ st.markdown(
     ------------------------------------------------------------- */
 
     .section-title {
-        font-family: var(--font-serif);
-        font-size: 1.55rem;
-        font-weight: 500;
-        margin-top: 0.5rem;
-        margin-bottom: 0.15rem;
-        color: var(--ink);
+        font-family: var(--font-serif) !important;
+        font-size: 1.55rem !important;
+        font-weight: 600 !important;
+        margin-top: 0.35rem;
+        margin-bottom: 0.2rem;
+        color: var(--ink) !important;
     }
 
     .section-description {
-        color: var(--ink-soft);
-        font-size: 0.95rem;
-        margin-bottom: 1.1rem;
+        color: var(--ink-soft) !important;
+        font-size: 0.95rem !important;
+        margin-bottom: 1.15rem;
         max-width: 62ch;
+        line-height: 1.5;
+    }
+
+    /* -------------------------------------------------------------
+       Callout / empty-state cards (replace low-contrast st.info)
+    ------------------------------------------------------------- */
+
+    .callout {
+        padding: 1rem 1.15rem;
+        border-left: 3px solid var(--info-border);
+        background: var(--info-bg);
+        color: var(--info-ink) !important;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin: 0.75rem 0 1rem 0;
+        border-radius: 0 4px 4px 0;
+    }
+
+    .callout-muted {
+        border-left-color: var(--accent);
+        background: var(--accent-soft);
+        color: var(--ink) !important;
     }
 
     /* -------------------------------------------------------------
@@ -148,24 +191,28 @@ st.markdown(
     ------------------------------------------------------------- */
 
     .stat-card {
-        padding: 0.9rem 1.1rem;
-        border-top: 2px solid var(--ink);
+        padding: 1rem 1.15rem;
+        border-top: 2.5px solid var(--ink);
         background: var(--paper-raised);
         min-height: 92px;
+        box-shadow: 0 1px 0 rgba(26, 31, 43, 0.04);
     }
 
     .stat-label {
-        font-size: 0.78rem;
-        color: var(--ink-soft);
-        margin-bottom: 0.3rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--ink-soft) !important;
+        margin-bottom: 0.35rem;
     }
 
     .stat-value {
-        font-family: var(--font-serif);
-        font-size: 1.3rem;
-        font-weight: 500;
+        font-family: var(--font-serif) !important;
+        font-size: 1.3rem !important;
+        font-weight: 600 !important;
         word-break: break-word;
-        color: var(--ink);
+        color: var(--ink) !important;
     }
 
     /* -------------------------------------------------------------
@@ -173,32 +220,35 @@ st.markdown(
     ------------------------------------------------------------- */
 
     .answer-container {
-        padding: 1.5rem 1.6rem;
+        padding: 1.5rem 1.65rem;
         border-left: 3px solid var(--accent);
         background: var(--paper-raised);
         margin-top: 0.75rem;
         margin-bottom: 1.1rem;
+        box-shadow: 0 1px 0 rgba(26, 31, 43, 0.04);
     }
 
     .answer-label {
-        font-family: var(--font-sans);
-        font-size: 0.8rem;
-        font-weight: 500;
-        color: var(--accent);
+        font-family: var(--font-sans) !important;
+        font-size: 0.78rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--accent) !important;
         margin-bottom: 0.5rem;
     }
 
     .answer-timestamp {
         font-size: 0.78rem;
-        color: var(--ink-soft);
+        color: var(--ink-soft) !important;
         margin-bottom: 0.9rem;
     }
 
     .answer-body {
-        font-family: var(--font-serif);
-        font-size: 1.12rem;
+        font-family: var(--font-serif) !important;
+        font-size: 1.12rem !important;
         line-height: 1.65;
-        color: var(--ink);
+        color: var(--ink) !important;
     }
 
     /* -------------------------------------------------------------
@@ -206,10 +256,10 @@ st.markdown(
     ------------------------------------------------------------- */
 
     .history-question {
-        font-family: var(--font-serif);
-        font-style: italic;
-        font-size: 1.1rem;
-        color: var(--ink);
+        font-family: var(--font-serif) !important;
+        font-style: italic !important;
+        font-size: 1.1rem !important;
+        color: var(--ink) !important;
         margin-bottom: 0.5rem;
         padding-top: 0.75rem;
     }
@@ -219,27 +269,27 @@ st.markdown(
     ------------------------------------------------------------- */
 
     .citation-card {
-        padding: 0.7rem 0 0.7rem 0.9rem;
+        padding: 0.75rem 0 0.75rem 0.95rem;
         border-left: 2px solid var(--line);
-        margin-bottom: 0.6rem;
+        margin-bottom: 0.65rem;
     }
 
     .citation-title {
-        font-family: var(--font-serif);
-        font-size: 1.02rem;
-        color: var(--ink);
+        font-family: var(--font-serif) !important;
+        font-size: 1.02rem !important;
+        color: var(--ink) !important;
         margin-bottom: 0.2rem;
     }
 
     .citation-number {
-        color: var(--accent);
+        color: var(--accent) !important;
         font-style: italic;
         margin-right: 0.15rem;
     }
 
     .citation-meta {
         font-size: 0.82rem;
-        color: var(--ink-soft);
+        color: var(--ink-soft) !important;
         display: flex;
         gap: 1.1rem;
         flex-wrap: wrap;
@@ -250,62 +300,102 @@ st.markdown(
     ------------------------------------------------------------- */
 
     section[data-testid="stSidebar"] {
-        background: var(--paper-raised);
+        background: var(--paper-raised) !important;
         border-right: 1px solid var(--line);
     }
 
-    .sidebar-brand {
-        font-family: var(--font-serif);
-        font-size: 1.5rem;
-        font-weight: 500;
-        margin-bottom: 0.1rem;
+    section[data-testid="stSidebar"] > div {
+        background: var(--paper-raised) !important;
+    }
+
+    section[data-testid="stSidebar"] * {
         color: var(--ink);
+    }
+
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] label {
+        color: var(--ink) !important;
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stCaptionContainer"],
+    section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] * {
+        color: var(--ink-soft) !important;
+        opacity: 1 !important;
+    }
+
+    .sidebar-brand {
+        font-family: var(--font-serif) !important;
+        font-size: 1.55rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.15rem;
+        color: var(--ink) !important;
     }
 
     .sidebar-brand-rule {
-        width: 2.5rem;
-        height: 2px;
+        width: 2.75rem;
+        height: 2.5px;
         background: var(--accent);
-        margin-bottom: 0.7rem;
+        margin-bottom: 0.75rem;
     }
 
     .sidebar-description {
-        font-size: 0.88rem;
-        color: var(--ink-soft);
+        font-size: 0.9rem !important;
+        color: var(--ink-soft) !important;
         line-height: 1.55;
+        margin-bottom: 0.5rem;
+    }
+
+    .sidebar-section-label {
+        font-family: var(--font-sans) !important;
+        font-size: 0.72rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink) !important;
+        margin: 0.85rem 0 0.55rem 0;
     }
 
     .sidebar-item {
-        font-size: 0.9rem;
-        margin-bottom: 0.55rem;
-        color: var(--ink);
+        font-size: 0.9rem !important;
+        margin-bottom: 0.5rem;
+        color: var(--ink) !important;
+        line-height: 1.4;
     }
 
     .sidebar-item strong {
-        color: var(--accent);
+        color: var(--accent) !important;
         font-family: var(--font-serif);
         font-style: italic;
+        font-weight: 600;
+    }
+
+    .sidebar-system-list {
+        font-size: 0.88rem !important;
+        color: var(--ink-soft) !important;
+        line-height: 1.7;
+        margin-bottom: 0.25rem;
     }
 
     .status-pill {
         display: inline-flex;
         align-items: center;
-        gap: 0.4rem;
-        padding: 0.3rem 0.75rem;
-        border-radius: 3px;
-        font-size: 0.82rem;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
+        gap: 0.45rem;
+        padding: 0.35rem 0.8rem;
+        border-radius: 4px;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.55rem;
     }
 
     .status-online {
         background: var(--teal-soft);
-        color: var(--teal);
+        color: var(--teal) !important;
     }
 
     .status-offline {
         background: var(--brick-soft);
-        color: var(--brick);
+        color: var(--brick) !important;
     }
 
     .status-dot {
@@ -313,6 +403,7 @@ st.markdown(
         height: 7px;
         border-radius: 50%;
         background: currentColor;
+        flex-shrink: 0;
     }
 
     /* -------------------------------------------------------------
@@ -322,10 +413,10 @@ st.markdown(
     .app-footer {
         text-align: left;
         padding-top: 1.5rem;
-        margin-top: 3rem;
+        margin-top: 2.75rem;
         border-top: 1px solid var(--line);
-        color: var(--ink-soft);
-        font-size: 0.85rem;
+        color: var(--ink-soft) !important;
+        font-size: 0.85rem !important;
     }
 
     /* -------------------------------------------------------------
@@ -333,53 +424,87 @@ st.markdown(
     ------------------------------------------------------------- */
 
     .stButton > button {
-        border-radius: 3px;
-        font-weight: 500;
+        border-radius: 4px !important;
+        font-weight: 600 !important;
         min-height: 2.7rem;
-        border: 1px solid var(--ink);
-        background: var(--ink);
-        color: var(--paper);
-        transition: background 0.15s ease, color 0.15s ease;
+        border: 1.5px solid var(--ink) !important;
+        background: var(--ink) !important;
+        color: #FFFEFA !important;
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
     }
 
     .stButton > button:hover {
-        background: var(--paper);
-        color: var(--ink);
-        border: 1px solid var(--ink);
+        background: transparent !important;
+        color: var(--ink) !important;
+        border: 1.5px solid var(--ink) !important;
     }
 
     .stButton > button:focus-visible {
-        outline: 2px solid var(--accent);
+        outline: 2px solid var(--accent) !important;
         outline-offset: 2px;
     }
 
     .stDownloadButton > button {
-        border-radius: 3px;
-        border: 1px solid var(--line);
-        background: var(--paper);
-        color: var(--ink);
-        font-weight: 500;
+        border-radius: 4px !important;
+        border: 1.5px solid var(--line) !important;
+        background: var(--paper-raised) !important;
+        color: var(--ink) !important;
+        font-weight: 600 !important;
     }
 
     .stDownloadButton > button:hover {
-        border-color: var(--accent);
-        color: var(--accent);
+        border-color: var(--accent) !important;
+        color: var(--accent) !important;
     }
 
+    /* File uploader — light dropzone, not dark navy */
     [data-testid="stFileUploader"] {
-        border-radius: 4px;
+        border-radius: 6px;
+    }
+
+    [data-testid="stFileUploader"] section,
+    [data-testid="stFileUploader"] [data-testid="stFileUploaderDropzone"] {
+        background: var(--paper-raised) !important;
+        border: 1.5px dashed var(--line) !important;
+        border-radius: 6px !important;
+        color: var(--ink) !important;
+    }
+
+    [data-testid="stFileUploader"] [data-testid="stFileUploaderDropzone"] * {
+        color: var(--ink-soft) !important;
+    }
+
+    [data-testid="stFileUploader"] button {
+        background: var(--ink) !important;
+        color: #FFFEFA !important;
+        border: none !important;
+        border-radius: 4px !important;
+        font-weight: 600 !important;
+    }
+
+    [data-testid="stFileUploader"] button:hover {
+        background: var(--accent) !important;
+        color: #FFFEFA !important;
+    }
+
+    [data-testid="stFileUploader"] label,
+    [data-testid="stFileUploader"] small,
+    [data-testid="stFileUploader"] span {
+        color: var(--ink-soft) !important;
     }
 
     .stTextArea textarea {
-        font-family: var(--font-serif);
-        font-size: 1.05rem;
-        border-radius: 3px;
-        border: 1px solid var(--line);
+        font-family: var(--font-serif) !important;
+        font-size: 1.05rem !important;
+        border-radius: 4px !important;
+        border: 1.5px solid var(--line) !important;
+        background: var(--paper-raised) !important;
+        color: var(--ink) !important;
     }
 
     .stTextArea textarea:focus {
-        border-color: var(--accent);
-        box-shadow: none;
+        border-color: var(--accent) !important;
+        box-shadow: 0 0 0 2px var(--accent-soft) !important;
     }
 
     .stTabs [data-baseweb="tab-list"] {
@@ -388,21 +513,60 @@ st.markdown(
     }
 
     .stTabs [data-baseweb="tab"] {
-        font-family: var(--font-serif);
-        font-size: 1.02rem;
-        color: var(--ink-soft);
+        font-family: var(--font-serif) !important;
+        font-size: 1.02rem !important;
+        color: var(--ink-soft) !important;
     }
 
     .stTabs [aria-selected="true"] {
         color: var(--ink) !important;
     }
 
+    /* Streamlit native alerts — readable contrast */
+    [data-testid="stAlert"] {
+        border-radius: 4px !important;
+    }
+
+    [data-testid="stAlert"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stAlert"] p,
+    div[role="alert"] p {
+        color: var(--ink) !important;
+        opacity: 1 !important;
+    }
+
+    div[data-baseweb="notification"],
+    .stAlert {
+        background: var(--info-bg) !important;
+        color: var(--info-ink) !important;
+        border: 1px solid rgba(46, 122, 110, 0.25) !important;
+    }
+
+    .stAlert p, .stAlert span, .stAlert div {
+        color: var(--info-ink) !important;
+    }
+
+    /* Captions everywhere */
+    [data-testid="stCaptionContainer"],
+    [data-testid="stCaptionContainer"] p,
+    .stCaption, small {
+        color: var(--ink-soft) !important;
+        opacity: 1 !important;
+    }
+
+    /* Markdown body text */
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] li {
+        color: var(--ink) !important;
+    }
+
     hr {
         border-color: var(--line) !important;
+        margin: 1.25rem 0 !important;
     }
 
     ::selection {
         background: var(--accent-soft);
+        color: var(--ink);
     }
 
     </style>
@@ -561,7 +725,10 @@ def render_sidebar():
         # Backend status
         # ---------------------------------------------------------
 
-        st.markdown("**Backend**")
+        st.markdown(
+            '<div class="sidebar-section-label">Backend</div>',
+            unsafe_allow_html=True,
+        )
 
         backend_online = check_backend_health()
 
@@ -577,14 +744,20 @@ def render_sidebar():
                 '<span class="status-dot"></span> Unreachable</span>',
                 unsafe_allow_html=True,
             )
-            st.caption(f"Expected at {API_BASE_URL}")
+            st.markdown(
+                f'<div class="sidebar-system-list">Expected at {API_BASE_URL}</div>',
+                unsafe_allow_html=True,
+            )
 
         if st.button("Refresh status", use_container_width=True):
             st.rerun()
 
         st.divider()
 
-        st.markdown("**How it works**")
+        st.markdown(
+            '<div class="sidebar-section-label">How it works</div>',
+            unsafe_allow_html=True,
+        )
 
         st.markdown(
             """
@@ -599,13 +772,23 @@ def render_sidebar():
 
         st.divider()
 
-        st.markdown("**System**")
+        st.markdown(
+            '<div class="sidebar-section-label">System</div>',
+            unsafe_allow_html=True,
+        )
 
-        st.caption("FastAPI backend")
-        st.caption("BGE embeddings")
-        st.caption("FAISS retrieval")
-        st.caption("Cross-encoder reranking")
-        st.caption("Ollama LLM")
+        st.markdown(
+            """
+            <div class="sidebar-system-list">
+                FastAPI backend<br>
+                BGE embeddings<br>
+                FAISS retrieval<br>
+                Cross-encoder reranking<br>
+                Ollama LLM
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
         # ---------------------------------------------------------
         # Session controls
@@ -615,10 +798,16 @@ def render_sidebar():
 
             st.divider()
 
-            st.markdown("**Session**")
+            st.markdown(
+                '<div class="sidebar-section-label">Session</div>',
+                unsafe_allow_html=True,
+            )
 
-            st.caption(
-                f"{len(st.session_state['qa_history'])} question(s) asked"
+            st.markdown(
+                f'<div class="sidebar-system-list">'
+                f'{len(st.session_state["qa_history"])} question(s) asked'
+                f'</div>',
+                unsafe_allow_html=True,
             )
 
             if st.button(
@@ -636,7 +825,10 @@ def render_sidebar():
 
         st.divider()
 
-        st.caption("Local retrieval-augmented generation")
+        st.markdown(
+            '<div class="sidebar-system-list">Local retrieval-augmented generation</div>',
+            unsafe_allow_html=True,
+        )
 
 
 # -------------------------------------------------------------------
@@ -779,8 +971,9 @@ def display_citations(citations, key_prefix=""):
     )
 
     if not citations:
-        st.info(
-            "No citations were returned for this answer."
+        st.markdown(
+            '<div class="callout">No citations were returned for this answer.</div>',
+            unsafe_allow_html=True,
         )
 
         return
@@ -923,8 +1116,9 @@ def render_upload_section():
 
     if uploaded_file is None:
 
-        st.info(
-            "Upload a PDF to begin your research session."
+        st.markdown(
+            '<div class="callout">Upload a PDF to begin your research session.</div>',
+            unsafe_allow_html=True,
         )
 
         return
@@ -1328,9 +1522,12 @@ def main():
 
         st.divider()
 
-        st.info(
-            "Your research workspace will appear here "
-            "after a document is processed."
+        st.markdown(
+            '<div class="callout callout-muted">'
+            'Your research workspace will appear here '
+            'after a document is processed.'
+            '</div>',
+            unsafe_allow_html=True,
         )
 
     # ---------------------------------------------------------------
