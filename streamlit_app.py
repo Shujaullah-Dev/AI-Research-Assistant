@@ -33,75 +33,68 @@ st.set_page_config(
 
 
 # -------------------------------------------------------------------
-# Custom styling
+# Design system
 #
-# Design language: a reading room / lab notebook for papers.
-# Serif for anything read (headings, questions, answers), a plain
-# grotesque for anything operated (buttons, labels, chrome).
-# Ink-on-paper palette with a single warm accent used sparingly.
+# A modern reading interface for research papers: a deep indigo accent
+# on a clean paper background, soft layered shadows, rounded surfaces,
+# and a serif voice reserved for anything meant to be read (masthead,
+# questions, answers) while a plain grotesque carries the controls.
 # -------------------------------------------------------------------
 
 st.markdown(
     """
     <style>
 
-    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400;1,8..60,500&display=swap');
 
     :root {
-        --ink: #1A1F2B;
-        --ink-soft: #4A5568;
-        --paper: #F7F4EC;
-        --paper-raised: #FFFEFA;
-        --line: #D6D0C0;
-        --accent: #9A5A1F;
-        --accent-soft: rgba(154, 90, 31, 0.12);
-        --teal: #1F5A52;
-        --teal-soft: rgba(31, 90, 82, 0.12);
-        --brick: #8B3A2C;
-        --brick-soft: rgba(139, 58, 44, 0.12);
-        --info-bg: #E8F1F0;
-        --info-ink: #1F5A52;
-        --info-border: #2E7A6E;
-        --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
-        --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        --ink: #171B26;
+        --ink-soft: #525B6E;
+        --ink-faint: #8B93A5;
+        --paper: #F3F4F9;
+        --surface: #FFFFFF;
+        --surface-2: #F7F8FC;
+        --line: #E2E5EE;
+        --line-strong: #C6CCDC;
+        --accent: #4C5FD5;
+        --accent-strong: #3A49B4;
+        --accent-soft: rgba(76, 95, 213, 0.09);
+        --accent-border: rgba(76, 95, 213, 0.38);
+        --teal: #0E8A72;
+        --teal-soft: rgba(14, 138, 114, 0.10);
+        --brick: #B4452F;
+        --brick-soft: rgba(180, 69, 47, 0.10);
+        --radius: 14px;
+        --radius-sm: 9px;
+        --shadow-sm: 0 1px 2px rgba(23, 27, 38, 0.05);
+        --shadow-md: 0 6px 16px rgba(23, 27, 38, 0.07);
+        --shadow-lg: 0 16px 40px rgba(23, 27, 38, 0.12);
+        --font-sans: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+        --font-serif: 'Source Serif 4', Georgia, serif;
     }
 
-    /* Force light reading-room theme even if OS prefers dark */
-    html, body, [data-testid="stAppViewContainer"],
-    [data-testid="stHeader"], .stApp, .stApp > header {
-        background-color: var(--paper) !important;
-        color: var(--ink) !important;
-    }
-
-    html, body, [class*="css"], p, span, label, li, div {
+    html, body, [class*="css"] {
         font-family: var(--font-sans);
+        color: var(--ink);
     }
 
     .stApp {
-        background:
-            radial-gradient(ellipse 80% 50% at 100% -10%, rgba(154, 90, 31, 0.06), transparent 50%),
-            radial-gradient(ellipse 60% 40% at 0% 100%, rgba(31, 90, 82, 0.05), transparent 45%),
-            var(--paper) !important;
-        color: var(--ink) !important;
+        background: var(--paper);
     }
-
-    [data-testid="stHeader"] {
-        background: transparent !important;
-    }
-
-    /* -------------------------------------------------------------
-       Global layout
-    ------------------------------------------------------------- */
 
     .block-container {
-        padding-top: 1.75rem;
-        padding-bottom: 4rem;
-        max-width: 1080px;
+        padding-top: 2rem;
+        padding-bottom: 5rem;
+        max-width: 1120px;
+    }
+
+    ::selection {
+        background: var(--accent-soft);
     }
 
     /* -------------------------------------------------------------
        Masthead
-    ------------------------------------------------------------- */
+       ------------------------------------------------------------- */
 
     @keyframes settle {
         from { opacity: 0; transform: translateY(8px); }
@@ -109,293 +102,352 @@ st.markdown(
     }
 
     .masthead {
-        padding: 0.5rem 0 1.5rem 0;
-        border-bottom: 2.5px solid var(--ink);
-        margin-bottom: 1.25rem;
+        position: relative;
+        overflow: hidden;
+        border-radius: 18px;
+        padding: 2.4rem 2.6rem 2.1rem 2.6rem;
+        margin-bottom: 2rem;
+        background: linear-gradient(125deg, #1C2242 0%, #2A3160 48%, #3A49B4 100%);
+        color: #FFFFFF;
+        box-shadow: var(--shadow-lg);
         animation: settle 0.55s ease-out;
     }
 
+    .masthead::after {
+        content: "";
+        position: absolute;
+        top: -40%;
+        right: -12%;
+        width: 46%;
+        height: 180%;
+        background: radial-gradient(
+            closest-side,
+            rgba(124, 140, 240, 0.35),
+            transparent
+        );
+        pointer-events: none;
+    }
+
     .masthead-kicker {
-        font-family: var(--font-sans) !important;
-        font-size: 0.78rem !important;
-        font-weight: 600 !important;
-        letter-spacing: 0.06em;
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: var(--accent) !important;
-        margin-bottom: 0.45rem !important;
+        color: #C7CFFF;
+        margin-bottom: 0.7rem;
     }
 
     .masthead-title {
-        font-family: var(--font-serif) !important;
-        font-size: 2.85rem !important;
-        font-weight: 600 !important;
-        line-height: 1.08 !important;
-        letter-spacing: -0.02em;
-        margin-bottom: 0.45rem !important;
-        color: var(--ink) !important;
+        font-family: var(--font-serif);
+        font-size: 2.9rem;
+        font-weight: 500;
+        line-height: 1.05;
+        letter-spacing: -0.015em;
+        margin-bottom: 0.55rem;
     }
 
     .masthead-subtitle {
-        font-family: var(--font-serif) !important;
-        font-style: italic !important;
-        font-size: 1.18rem !important;
-        color: var(--ink-soft) !important;
-        max-width: 48ch;
-        line-height: 1.45;
+        font-family: var(--font-serif);
+        font-style: italic;
+        font-size: 1.18rem;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.80);
+        max-width: 52ch;
+        margin-bottom: 1.3rem;
+    }
+
+    .masthead-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+    }
+
+    .masthead-badge {
+        font-size: 0.74rem;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        color: rgba(255, 255, 255, 0.92);
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 999px;
+        padding: 0.28rem 0.75rem;
+        backdrop-filter: blur(4px);
     }
 
     /* -------------------------------------------------------------
        Section headers
-    ------------------------------------------------------------- */
+       ------------------------------------------------------------- */
 
     .section-title {
-        font-family: var(--font-serif) !important;
-        font-size: 1.55rem !important;
-        font-weight: 600 !important;
-        margin-top: 0.35rem;
+        font-family: var(--font-serif);
+        font-size: 1.55rem;
+        font-weight: 500;
+        color: var(--ink);
+        margin-top: 0.4rem;
         margin-bottom: 0.2rem;
-        color: var(--ink) !important;
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+    }
+
+    .section-title::before {
+        content: "";
+        width: 4px;
+        height: 1.25rem;
+        border-radius: 4px;
+        background: var(--accent);
+        flex-shrink: 0;
     }
 
     .section-description {
-        color: var(--ink-soft) !important;
-        font-size: 0.95rem !important;
+        color: var(--ink-soft);
+        font-size: 0.94rem;
+        line-height: 1.55;
         margin-bottom: 1.15rem;
-        max-width: 62ch;
-        line-height: 1.5;
-    }
-
-    /* -------------------------------------------------------------
-       Callout / empty-state cards (replace low-contrast st.info)
-    ------------------------------------------------------------- */
-
-    .callout {
-        padding: 1rem 1.15rem;
-        border-left: 3px solid var(--info-border);
-        background: var(--info-bg);
-        color: var(--info-ink) !important;
-        font-size: 0.95rem;
-        line-height: 1.5;
-        margin: 0.75rem 0 1rem 0;
-        border-radius: 0 4px 4px 0;
-    }
-
-    .callout-muted {
-        border-left-color: var(--accent);
-        background: var(--accent-soft);
-        color: var(--ink) !important;
+        max-width: 64ch;
     }
 
     /* -------------------------------------------------------------
        Document statistics cards
-    ------------------------------------------------------------- */
+       ------------------------------------------------------------- */
 
     .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--accent);
+        border-radius: var(--radius);
         padding: 1rem 1.15rem;
-        border-top: 2.5px solid var(--ink);
-        background: var(--paper-raised);
-        min-height: 92px;
-        box-shadow: 0 1px 0 rgba(26, 31, 43, 0.04);
+        min-height: 96px;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
 
     .stat-label {
-        font-size: 0.75rem;
-        font-weight: 500;
-        letter-spacing: 0.04em;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.09em;
         text-transform: uppercase;
-        color: var(--ink-soft) !important;
-        margin-bottom: 0.35rem;
+        color: var(--ink-faint);
+        margin-bottom: 0.4rem;
     }
 
     .stat-value {
-        font-family: var(--font-serif) !important;
-        font-size: 1.3rem !important;
-        font-weight: 600 !important;
+        font-family: var(--font-serif);
+        font-size: 1.35rem;
+        font-weight: 500;
+        line-height: 1.25;
         word-break: break-word;
-        color: var(--ink) !important;
+        color: var(--ink);
     }
 
     /* -------------------------------------------------------------
        Answer container
-    ------------------------------------------------------------- */
+       ------------------------------------------------------------- */
 
     .answer-container {
-        padding: 1.5rem 1.65rem;
-        border-left: 3px solid var(--accent);
-        background: var(--paper-raised);
-        margin-top: 0.75rem;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--accent);
+        border-radius: var(--radius);
+        padding: 1.5rem 1.7rem;
+        margin-top: 0.6rem;
         margin-bottom: 1.1rem;
-        box-shadow: 0 1px 0 rgba(26, 31, 43, 0.04);
+        box-shadow: var(--shadow-md);
     }
 
     .answer-label {
-        font-family: var(--font-sans) !important;
-        font-size: 0.78rem !important;
-        font-weight: 600 !important;
-        letter-spacing: 0.05em;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
-        color: var(--accent) !important;
-        margin-bottom: 0.5rem;
+        color: var(--accent-strong);
+        margin-bottom: 0.55rem;
     }
 
     .answer-timestamp {
         font-size: 0.78rem;
-        color: var(--ink-soft) !important;
-        margin-bottom: 0.9rem;
+        color: var(--ink-faint);
+        margin-bottom: 0.85rem;
     }
 
     .answer-body {
-        font-family: var(--font-serif) !important;
-        font-size: 1.12rem !important;
-        line-height: 1.65;
-        color: var(--ink) !important;
+        font-family: var(--font-serif);
+        font-size: 1.13rem;
+        line-height: 1.7;
+        color: var(--ink);
+        white-space: pre-wrap;
     }
 
     /* -------------------------------------------------------------
        History question header
-    ------------------------------------------------------------- */
+       ------------------------------------------------------------- */
 
     .history-question {
-        font-family: var(--font-serif) !important;
-        font-style: italic !important;
-        font-size: 1.1rem !important;
-        color: var(--ink) !important;
-        margin-bottom: 0.5rem;
-        padding-top: 0.75rem;
+        font-family: var(--font-serif);
+        font-style: italic;
+        font-size: 1.08rem;
+        color: var(--ink);
+        border-left: 3px solid var(--accent-border);
+        padding-left: 0.95rem;
+        margin-bottom: 0.6rem;
+        padding-top: 0.7rem;
     }
 
     /* -------------------------------------------------------------
-       Citation / footnote cards
-    ------------------------------------------------------------- */
+       Citation cards
+       ------------------------------------------------------------- */
 
     .citation-card {
-        padding: 0.75rem 0 0.75rem 0.95rem;
-        border-left: 2px solid var(--line);
+        background: var(--surface-2);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        padding: 0.85rem 1.05rem;
         margin-bottom: 0.65rem;
+        box-shadow: var(--shadow-sm);
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .citation-card:hover {
+        border-color: var(--accent-border);
+        box-shadow: var(--shadow-md);
     }
 
     .citation-title {
-        font-family: var(--font-serif) !important;
-        font-size: 1.02rem !important;
-        color: var(--ink) !important;
-        margin-bottom: 0.2rem;
+        font-family: var(--font-serif);
+        font-size: 1.04rem;
+        font-weight: 500;
+        color: var(--ink);
+        margin-bottom: 0.45rem;
     }
 
     .citation-number {
-        color: var(--accent) !important;
+        color: var(--accent);
         font-style: italic;
-        margin-right: 0.15rem;
+        margin-right: 0.2rem;
     }
 
     .citation-meta {
-        font-size: 0.82rem;
-        color: var(--ink-soft) !important;
         display: flex;
-        gap: 1.1rem;
+        gap: 0.5rem;
         flex-wrap: wrap;
+    }
+
+    .chip {
+        font-size: 0.76rem;
+        font-weight: 500;
+        color: var(--accent-strong);
+        background: var(--accent-soft);
+        border-radius: 999px;
+        padding: 0.2rem 0.65rem;
+        white-space: nowrap;
     }
 
     /* -------------------------------------------------------------
        Sidebar
-    ------------------------------------------------------------- */
+       ------------------------------------------------------------- */
 
     section[data-testid="stSidebar"] {
-        background: var(--paper-raised) !important;
+        background: linear-gradient(180deg, #FFFFFF 0%, var(--surface-2) 100%);
         border-right: 1px solid var(--line);
     }
 
-    section[data-testid="stSidebar"] > div {
-        background: var(--paper-raised) !important;
-    }
-
-    section[data-testid="stSidebar"] * {
-        color: var(--ink);
-    }
-
-    section[data-testid="stSidebar"] p,
-    section[data-testid="stSidebar"] span,
-    section[data-testid="stSidebar"] label {
-        color: var(--ink) !important;
-    }
-
-    section[data-testid="stSidebar"] [data-testid="stCaptionContainer"],
-    section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] * {
-        color: var(--ink-soft) !important;
-        opacity: 1 !important;
-    }
-
     .sidebar-brand {
-        font-family: var(--font-serif) !important;
-        font-size: 1.55rem !important;
-        font-weight: 600 !important;
+        font-family: var(--font-serif);
+        font-size: 1.55rem;
+        font-weight: 500;
+        color: var(--ink);
         margin-bottom: 0.15rem;
-        color: var(--ink) !important;
     }
 
     .sidebar-brand-rule {
-        width: 2.75rem;
-        height: 2.5px;
+        width: 2.6rem;
+        height: 3px;
+        border-radius: 3px;
         background: var(--accent);
         margin-bottom: 0.75rem;
     }
 
     .sidebar-description {
-        font-size: 0.9rem !important;
-        color: var(--ink-soft) !important;
-        line-height: 1.55;
-        margin-bottom: 0.5rem;
+        font-size: 0.88rem;
+        line-height: 1.6;
+        color: var(--ink-soft);
     }
 
-    .sidebar-section-label {
-        font-family: var(--font-sans) !important;
-        font-size: 0.72rem !important;
-        font-weight: 600 !important;
-        letter-spacing: 0.08em;
+    .sidebar-heading {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.11em;
         text-transform: uppercase;
-        color: var(--ink) !important;
-        margin: 0.85rem 0 0.55rem 0;
+        color: var(--ink-faint);
+        margin-bottom: 0.45rem;
+    }
+
+    .sidebar-step {
+        display: flex;
+        align-items: baseline;
+        gap: 0.55rem;
+        font-size: 0.88rem;
+        color: var(--ink);
+        margin-bottom: 0.5rem;
+        line-height: 1.45;
+    }
+
+    .sidebar-step-number {
+        flex-shrink: 0;
+        width: 1.35rem;
+        height: 1.35rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--accent-strong);
+        background: var(--accent-soft);
+        border-radius: 50%;
     }
 
     .sidebar-item {
-        font-size: 0.9rem !important;
-        margin-bottom: 0.5rem;
-        color: var(--ink) !important;
-        line-height: 1.4;
+        font-size: 0.86rem;
+        color: var(--ink-soft);
+        line-height: 1.6;
     }
 
     .sidebar-item strong {
-        color: var(--accent) !important;
+        color: var(--accent-strong);
         font-family: var(--font-serif);
         font-style: italic;
-        font-weight: 600;
     }
 
-    .sidebar-system-list {
-        font-size: 0.88rem !important;
-        color: var(--ink-soft) !important;
-        line-height: 1.7;
-        margin-bottom: 0.25rem;
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.35; }
     }
 
     .status-pill {
         display: inline-flex;
         align-items: center;
         gap: 0.45rem;
-        padding: 0.35rem 0.8rem;
-        border-radius: 4px;
-        font-size: 0.82rem !important;
-        font-weight: 600 !important;
-        margin-bottom: 0.55rem;
+        padding: 0.32rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
     }
 
     .status-online {
         background: var(--teal-soft);
-        color: var(--teal) !important;
+        color: var(--teal);
     }
 
     .status-offline {
         background: var(--brick-soft);
-        color: var(--brick) !important;
+        color: var(--brick);
     }
 
     .status-dot {
@@ -403,170 +455,139 @@ st.markdown(
         height: 7px;
         border-radius: 50%;
         background: currentColor;
-        flex-shrink: 0;
+        animation: pulse 2.2s ease-in-out infinite;
     }
 
     /* -------------------------------------------------------------
        Footer
-    ------------------------------------------------------------- */
+       ------------------------------------------------------------- */
 
     .app-footer {
         text-align: left;
-        padding-top: 1.5rem;
-        margin-top: 2.75rem;
+        padding-top: 1.4rem;
+        margin-top: 3rem;
         border-top: 1px solid var(--line);
-        color: var(--ink-soft) !important;
-        font-size: 0.85rem !important;
+        color: var(--ink-faint);
+        font-size: 0.84rem;
     }
 
     /* -------------------------------------------------------------
        Streamlit widget overrides
-    ------------------------------------------------------------- */
+       ------------------------------------------------------------- */
 
     .stButton > button {
-        border-radius: 4px !important;
-        font-weight: 600 !important;
-        min-height: 2.7rem;
-        border: 1.5px solid var(--ink) !important;
-        background: var(--ink) !important;
-        color: #FFFEFA !important;
-        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        border-radius: 10px;
+        font-weight: 600;
+        min-height: 2.8rem;
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        color: var(--paper);
+        transition: background 0.15s ease, color 0.15s ease,
+                    border-color 0.15s ease, transform 0.1s ease;
     }
 
     .stButton > button:hover {
-        background: transparent !important;
-        color: var(--ink) !important;
-        border: 1.5px solid var(--ink) !important;
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #FFFFFF;
+    }
+
+    .stButton > button:active {
+        transform: translateY(1px);
     }
 
     .stButton > button:focus-visible {
-        outline: 2px solid var(--accent) !important;
+        outline: 2px solid var(--accent);
         outline-offset: 2px;
     }
 
     .stDownloadButton > button {
-        border-radius: 4px !important;
-        border: 1.5px solid var(--line) !important;
-        background: var(--paper-raised) !important;
-        color: var(--ink) !important;
-        font-weight: 600 !important;
+        border-radius: 10px;
+        border: 1px solid var(--line-strong);
+        background: var(--surface);
+        color: var(--ink);
+        font-weight: 600;
+        min-height: 2.6rem;
+        transition: border-color 0.15s ease, color 0.15s ease;
     }
 
     .stDownloadButton > button:hover {
-        border-color: var(--accent) !important;
-        color: var(--accent) !important;
+        border-color: var(--accent);
+        color: var(--accent-strong);
     }
 
-    /* File uploader — light dropzone, not dark navy */
     [data-testid="stFileUploader"] {
-        border-radius: 6px;
+        border-radius: var(--radius);
     }
 
-    [data-testid="stFileUploader"] section,
-    [data-testid="stFileUploader"] [data-testid="stFileUploaderDropzone"] {
-        background: var(--paper-raised) !important;
-        border: 1.5px dashed var(--line) !important;
-        border-radius: 6px !important;
-        color: var(--ink) !important;
+    [data-testid="stFileDropZone"] {
+        border: 2px dashed var(--line-strong);
+        border-radius: var(--radius);
+        background: var(--surface-2);
+        transition: border-color 0.15s ease, background 0.15s ease;
     }
 
-    [data-testid="stFileUploader"] [data-testid="stFileUploaderDropzone"] * {
-        color: var(--ink-soft) !important;
-    }
-
-    [data-testid="stFileUploader"] button {
-        background: var(--ink) !important;
-        color: #FFFEFA !important;
-        border: none !important;
-        border-radius: 4px !important;
-        font-weight: 600 !important;
-    }
-
-    [data-testid="stFileUploader"] button:hover {
-        background: var(--accent) !important;
-        color: #FFFEFA !important;
-    }
-
-    [data-testid="stFileUploader"] label,
-    [data-testid="stFileUploader"] small,
-    [data-testid="stFileUploader"] span {
-        color: var(--ink-soft) !important;
+    [data-testid="stFileDropZone"]:hover {
+        border-color: var(--accent);
+        background: var(--accent-soft);
     }
 
     .stTextArea textarea {
-        font-family: var(--font-serif) !important;
-        font-size: 1.05rem !important;
-        border-radius: 4px !important;
-        border: 1.5px solid var(--line) !important;
-        background: var(--paper-raised) !important;
-        color: var(--ink) !important;
+        font-family: var(--font-serif);
+        font-size: 1.04rem;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
     .stTextArea textarea:focus {
-        border-color: var(--accent) !important;
-        box-shadow: 0 0 0 2px var(--accent-soft) !important;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .stTextArea label {
+        font-weight: 600;
     }
 
     .stTabs [data-baseweb="tab-list"] {
-        gap: 1.5rem;
-        border-bottom: 1px solid var(--line);
+        gap: 1.25rem;
+        border-bottom: 2px solid var(--line);
     }
 
     .stTabs [data-baseweb="tab"] {
-        font-family: var(--font-serif) !important;
-        font-size: 1.02rem !important;
-        color: var(--ink-soft) !important;
+        font-family: var(--font-serif);
+        font-size: 1.02rem;
+        color: var(--ink-soft);
+        border-radius: 10px 10px 0 0;
+        padding: 0.5rem 0.25rem;
     }
 
     .stTabs [aria-selected="true"] {
-        color: var(--ink) !important;
+        color: var(--accent-strong) !important;
+        font-weight: 600;
     }
 
-    /* Streamlit native alerts — readable contrast */
-    [data-testid="stAlert"] {
-        border-radius: 4px !important;
+    details[data-testid="stExpander"] {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        background: var(--surface);
     }
 
-    [data-testid="stAlert"] [data-testid="stMarkdownContainer"] p,
-    [data-testid="stAlert"] p,
-    div[role="alert"] p {
-        color: var(--ink) !important;
-        opacity: 1 !important;
+    details[data-testid="stExpander"] summary {
+        font-weight: 600;
     }
 
-    div[data-baseweb="notification"],
-    .stAlert {
-        background: var(--info-bg) !important;
-        color: var(--info-ink) !important;
-        border: 1px solid rgba(46, 122, 110, 0.25) !important;
-    }
-
-    .stAlert p, .stAlert span, .stAlert div {
-        color: var(--info-ink) !important;
-    }
-
-    /* Captions everywhere */
-    [data-testid="stCaptionContainer"],
-    [data-testid="stCaptionContainer"] p,
-    .stCaption, small {
-        color: var(--ink-soft) !important;
-        opacity: 1 !important;
-    }
-
-    /* Markdown body text */
-    [data-testid="stMarkdownContainer"] p,
-    [data-testid="stMarkdownContainer"] li {
-        color: var(--ink) !important;
+    .stProgress > div > div > div > div {
+        background: linear-gradient(90deg, var(--accent), #7C8CF0);
+        border-radius: 999px;
     }
 
     hr {
         border-color: var(--line) !important;
-        margin: 1.25rem 0 !important;
     }
 
-    ::selection {
-        background: var(--accent-soft);
-        color: var(--ink);
+    .stCaption, caption {
+        color: var(--ink-faint);
     }
 
     </style>
@@ -599,7 +620,7 @@ if "question_input" not in st.session_state:
     st.session_state["question_input"] = ""
 
 def get_session_id():
-    
+
     """
     Return the unique identifier for the current
     Streamlit session.
@@ -712,21 +733,12 @@ def render_sidebar():
             unsafe_allow_html=True,
         )
 
-        # st.divider()
-
-        # st.caption("Current session")
-
-        # st.code(
-            # get_session_id(),
-            # language=None,
-        # )
-
         # ---------------------------------------------------------
         # Backend status
         # ---------------------------------------------------------
 
         st.markdown(
-            '<div class="sidebar-section-label">Backend</div>',
+            '<div class="sidebar-heading">Backend</div>',
             unsafe_allow_html=True,
         )
 
@@ -744,10 +756,7 @@ def render_sidebar():
                 '<span class="status-dot"></span> Unreachable</span>',
                 unsafe_allow_html=True,
             )
-            st.markdown(
-                f'<div class="sidebar-system-list">Expected at {API_BASE_URL}</div>',
-                unsafe_allow_html=True,
-            )
+            st.caption(f"Expected at {API_BASE_URL}")
 
         if st.button("Refresh status", use_container_width=True):
             st.rerun()
@@ -755,17 +764,32 @@ def render_sidebar():
         st.divider()
 
         st.markdown(
-            '<div class="sidebar-section-label">How it works</div>',
+            '<div class="sidebar-heading">How it works</div>',
             unsafe_allow_html=True,
         )
 
         st.markdown(
             """
-            <div class="sidebar-item"><strong>1.</strong> Upload a research paper</div>
-            <div class="sidebar-item"><strong>2.</strong> Extract and index the content</div>
-            <div class="sidebar-item"><strong>3.</strong> Ask a question</div>
-            <div class="sidebar-item"><strong>4.</strong> Retrieve relevant passages</div>
-            <div class="sidebar-item"><strong>5.</strong> Generate a grounded answer</div>
+            <div class="sidebar-step">
+                <span class="sidebar-step-number">1</span>
+                <span>Upload a research paper</span>
+            </div>
+            <div class="sidebar-step">
+                <span class="sidebar-step-number">2</span>
+                <span>Extract and index the content</span>
+            </div>
+            <div class="sidebar-step">
+                <span class="sidebar-step-number">3</span>
+                <span>Ask a question</span>
+            </div>
+            <div class="sidebar-step">
+                <span class="sidebar-step-number">4</span>
+                <span>Retrieve relevant passages</span>
+            </div>
+            <div class="sidebar-step">
+                <span class="sidebar-step-number">5</span>
+                <span>Generate a grounded answer</span>
+            </div>
             """,
             unsafe_allow_html=True,
         )
@@ -773,18 +797,18 @@ def render_sidebar():
         st.divider()
 
         st.markdown(
-            '<div class="sidebar-section-label">System</div>',
+            '<div class="sidebar-heading">System</div>',
             unsafe_allow_html=True,
         )
 
         st.markdown(
             """
-            <div class="sidebar-system-list">
-                FastAPI backend<br>
-                BGE embeddings<br>
-                FAISS retrieval<br>
-                Cross-encoder reranking<br>
-                Ollama LLM
+            <div class="sidebar-item">
+                <strong>FastAPI</strong> backend<br>
+                <strong>BGE</strong> embeddings<br>
+                <strong>FAISS</strong> retrieval<br>
+                <strong>Cross-encoder</strong> reranking<br>
+                <strong>Ollama</strong> LLM
             </div>
             """,
             unsafe_allow_html=True,
@@ -799,15 +823,12 @@ def render_sidebar():
             st.divider()
 
             st.markdown(
-                '<div class="sidebar-section-label">Session</div>',
+                '<div class="sidebar-heading">Session</div>',
                 unsafe_allow_html=True,
             )
 
-            st.markdown(
-                f'<div class="sidebar-system-list">'
-                f'{len(st.session_state["qa_history"])} question(s) asked'
-                f'</div>',
-                unsafe_allow_html=True,
+            st.caption(
+                f"{len(st.session_state['qa_history'])} question(s) asked"
             )
 
             if st.button(
@@ -825,10 +846,7 @@ def render_sidebar():
 
         st.divider()
 
-        st.markdown(
-            '<div class="sidebar-system-list">Local retrieval-augmented generation</div>',
-            unsafe_allow_html=True,
-        )
+        st.caption("Local retrieval-augmented generation")
 
 
 # -------------------------------------------------------------------
@@ -971,9 +989,8 @@ def display_citations(citations, key_prefix=""):
     )
 
     if not citations:
-        st.markdown(
-            '<div class="callout">No citations were returned for this answer.</div>',
-            unsafe_allow_html=True,
+        st.info(
+            "No citations were returned for this answer."
         )
 
         return
@@ -1016,9 +1033,9 @@ def display_citations(citations, key_prefix=""):
                     {document_name}
                 </div>
                 <div class="citation-meta">
-                    <span>Page {page_number}</span>
-                    <span>Chunk {chunk_id}</span>
-                    <span>{score_text}</span>
+                    <span class="chip">Page {page_number}</span>
+                    <span class="chip">Chunk {chunk_id}</span>
+                    <span class="chip">{score_text}</span>
                 </div>
             </div>
             """,
@@ -1116,15 +1133,13 @@ def render_upload_section():
 
     if uploaded_file is None:
 
-        st.markdown(
-            '<div class="callout">Upload a PDF to begin your research session.</div>',
-            unsafe_allow_html=True,
+        st.info(
+            "Upload a PDF to begin your research session."
         )
 
         return
 
     file_name = uploaded_file.name
-
     file_size = len(
         uploaded_file.getvalue()
     )
@@ -1155,7 +1170,6 @@ def render_upload_section():
         return
 
     file_size_mb = file_size / (1024 * 1024)
-
     st.caption(
         f"Selected: {file_name} · "
         f"{file_size_mb:.2f} MB"
@@ -1202,7 +1216,6 @@ def render_upload_section():
                 ] = []
 
                 st.session_state["qa_history"] = []
-
                 progress_bar.progress(100, text="Done.")
                 time.sleep(0.3)
 
@@ -1213,16 +1226,13 @@ def render_upload_section():
                 progress_bar.empty()
 
                 try:
-
                     error_data = response.json()
-
                     error_message = error_data.get(
                         "detail",
                         "The upload request failed.",
                     )
 
                 except ValueError:
-
                     error_message = (
                         "The server returned "
                         "an invalid error response."
@@ -1233,41 +1243,32 @@ def render_upload_section():
                 )
 
         except requests.exceptions.ConnectionError:
-
             progress_bar.empty()
-
             st.error(
                 "Could not connect to the FastAPI backend. "
                 "Please confirm that the API server is running."
             )
 
         except requests.exceptions.Timeout:
-
             progress_bar.empty()
-
             st.error(
                 "The request timed out while processing "
                 "the PDF. Please try again."
             )
 
         except requests.exceptions.RequestException as error:
-
             progress_bar.empty()
-
             st.error(
                 f"An unexpected network error occurred: {error}"
             )
 
         except Exception as error:
-
             progress_bar.empty()
-
             st.error(
                 f"An unexpected error occurred: {error}"
             )
 
     if st.session_state["uploaded_document"] is not None:
-
         display_upload_result(
             st.session_state["uploaded_document"]
         )
@@ -1334,7 +1335,6 @@ def render_question_section():
     if ask_button:
 
         if not question.strip():
-
             st.warning(
                 "Please enter a question before submitting."
             )
@@ -1354,7 +1354,6 @@ def render_question_section():
                 if response.status_code == 200:
 
                     answer_response = response.json()
-
                     answer = answer_response.get(
                         "answer",
                         "",
@@ -1388,16 +1387,13 @@ def render_question_section():
                 else:
 
                     try:
-
                         error_data = response.json()
-
                         error_message = error_data.get(
                             "detail",
                             "The question request failed.",
                         )
 
                     except ValueError:
-
                         error_message = (
                             "The server returned "
                             "an invalid error response."
@@ -1408,27 +1404,23 @@ def render_question_section():
                     )
 
             except requests.exceptions.ConnectionError:
-
                 st.error(
                     "Could not connect to the FastAPI backend. "
                     "Please confirm that the API server is running."
                 )
 
             except requests.exceptions.Timeout:
-
                 st.error(
                     "The request timed out while generating "
                     "the answer. Please try again."
                 )
 
             except requests.exceptions.RequestException as error:
-
                 st.error(
                     f"An unexpected network error occurred: {error}"
                 )
 
             except Exception as error:
-
                 st.error(
                     f"An unexpected error occurred: {error}"
                 )
@@ -1497,6 +1489,12 @@ def main():
                 Ask a paper what it means, and it will show you
                 exactly where it said so.
             </div>
+            <div class="masthead-badges">
+                <span class="masthead-badge">BGE embeddings</span>
+                <span class="masthead-badge">FAISS retrieval</span>
+                <span class="masthead-badge">Cross-encoder reranking</span>
+                <span class="masthead-badge">Ollama LLM</span>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1522,12 +1520,9 @@ def main():
 
         st.divider()
 
-        st.markdown(
-            '<div class="callout callout-muted">'
-            'Your research workspace will appear here '
-            'after a document is processed.'
-            '</div>',
-            unsafe_allow_html=True,
+        st.info(
+            "Your research workspace will appear here "
+            "after a document is processed."
         )
 
     # ---------------------------------------------------------------
