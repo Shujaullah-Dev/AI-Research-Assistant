@@ -60,39 +60,59 @@ The system accepts research-paper PDFs, extracts and chunks their text, creates 
 
 ## Architecture
 
-```text
-PDF
- │
- ▼
-Document Ingestion
- │
- ▼
-Text Extraction
- │
- ▼
-Chunking
- │
- ▼
-BGE Embeddings
- │
- ▼
-FAISS Vector Store
- │
- ▼
-Semantic Retrieval
- │
- ▼
-Cross-Encoder Reranking
- │
- ▼
-Relevance Filtering
- │
- ▼
-Local LLM (Ollama)
- │
- ▼
-Grounded Answer + Citations
+```mermaid
+flowchart TD
+    %% Custom Styling Definitions
+    classDef inputStyle fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#fff,font-weight:bold;
+    classDef processStyle fill:#0f172a,stroke:#64748b,stroke-width:1.5px,color:#f8fafc;
+    classDef vectorStyle fill:#1e1b4b,stroke:#6366f1,stroke-width:2px,color:#fff;
+    classDef rankStyle fill:#312e81,stroke:#818cf8,stroke-width:1.5px,color:#fff;
+    classDef llmStyle fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#fff,font-weight:bold;
+    classDef outputStyle fill:#022c22,stroke:#34d399,stroke-width:2px,color:#fff,font-weight:bold;
+
+    %% Source Input
+    subgraph Data_Ingestion [" Ingestion & Preprocessing"]
+        PDF["Source PDF"]:::inputStyle
+        Ingest[" Document Ingestion"]:::processStyle
+        Extract[" Text Extraction"]:::processStyle
+        Chunk[" Document Chunking"]:::processStyle
+    end
+
+    %% Embedding & Indexing
+    subgraph Vector_Indexing [" Embedding & Storage"]
+        BGE[" BGE Embeddings Model"]:::processStyle
+        FAISS[(" FAISS Vector Store")]:::vectorStyle
+    end
+
+    %% Retrieval Pipeline
+    subgraph Retrieval_Pipeline [" Retrieval & Reranking"]
+        Query[" User Query"]:::inputStyle
+        Semantic[" Semantic Retrieval"]:::processStyle
+        CrossEncoder[" Cross-Encoder Reranking"]:::rankStyle
+        Filter[" Relevance Filtering"]:::rankStyle
+    end
+
+    %% Generation Stage
+    subgraph Generation_Stage [" Generation & Output"]
+        Ollama[" Local LLM (Ollama)"]:::llmStyle
+        Answer[" Grounded Answer + Citations"]:::outputStyle
+    end
+
+    %% Flow Connections
+    PDF --> Ingest
+    Ingest --> Extract
+    Extract --> Chunk
+    Chunk --> BGE
+    BGE --> FAISS
+
+    Query --> Semantic
+    FAISS <-->|Vector Similarity| Semantic
+    Semantic --> CrossEncoder
+    CrossEncoder --> Filter
+    Filter -->|Top Context Chunks| Ollama
+    Ollama --> Answer
 ```
+
 
 ---
 
