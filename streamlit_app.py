@@ -48,27 +48,27 @@ st.markdown(
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400;1,8..60,500&display=swap');
 
     :root {
-        --ink: #171B26;
-        --ink-soft: #525B6E;
-        --ink-faint: #8B93A5;
-        --paper: #F3F4F9;
+        --ink: #172724;
+        --ink-soft: #50625D;
+        --ink-faint: #75847F;
+        --paper: #F1F4F0;
         --surface: #FFFFFF;
-        --surface-2: #F7F8FC;
-        --line: #E2E5EE;
-        --line-strong: #C6CCDC;
-        --accent: #4C5FD5;
-        --accent-strong: #3A49B4;
-        --accent-soft: rgba(76, 95, 213, 0.09);
-        --accent-border: rgba(76, 95, 213, 0.38);
-        --teal: #0E8A72;
-        --teal-soft: rgba(14, 138, 114, 0.10);
-        --brick: #B4452F;
-        --brick-soft: rgba(180, 69, 47, 0.10);
-        --radius: 14px;
-        --radius-sm: 9px;
-        --shadow-sm: 0 1px 2px rgba(23, 27, 38, 0.05);
-        --shadow-md: 0 6px 16px rgba(23, 27, 38, 0.07);
-        --shadow-lg: 0 16px 40px rgba(23, 27, 38, 0.12);
+        --surface-2: #F7F9F6;
+        --line: #DCE5DF;
+        --line-strong: #B9CAC0;
+        --accent: #176B57;
+        --accent-strong: #105342;
+        --accent-soft: rgba(23, 107, 87, 0.09);
+        --accent-border: rgba(23, 107, 87, 0.35);
+        --teal: #176B57;
+        --teal-soft: rgba(23, 107, 87, 0.10);
+        --brick: #A34132;
+        --brick-soft: rgba(163, 65, 50, 0.10);
+        --radius: 10px;
+        --radius-sm: 6px;
+        --shadow-sm: 0 1px 2px rgba(23, 39, 36, 0.04);
+        --shadow-md: 0 3px 10px rgba(23, 39, 36, 0.05);
+        --shadow-lg: 0 8px 24px rgba(23, 39, 36, 0.08);
         --font-sans: 'Inter', -apple-system, 'Segoe UI', sans-serif;
         --font-serif: 'Source Serif 4', Georgia, serif;
     }
@@ -85,7 +85,7 @@ st.markdown(
     .block-container {
         padding-top: 2rem;
         padding-bottom: 5rem;
-        max-width: 1120px;
+        max-width: 1320px;
     }
 
     ::selection {
@@ -104,12 +104,12 @@ st.markdown(
     .masthead {
         position: relative;
         overflow: hidden;
-        border-radius: 18px;
-        padding: 2.4rem 2.6rem 2.1rem 2.6rem;
-        margin-bottom: 2rem;
-        background: linear-gradient(125deg, #1C2242 0%, #2A3160 48%, #3A49B4 100%);
+        border-radius: 10px;
+        padding: 2rem 2.3rem 1.8rem;
+        margin-bottom: 1.4rem;
+        background: #173D35;
         color: #FFFFFF;
-        box-shadow: var(--shadow-lg);
+        box-shadow: none;
         animation: settle 0.55s ease-out;
     }
 
@@ -120,11 +120,7 @@ st.markdown(
         right: -12%;
         width: 46%;
         height: 180%;
-        background: radial-gradient(
-            closest-side,
-            rgba(124, 140, 240, 0.35),
-            transparent
-        );
+        background: repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 1px, transparent 1px 12px);
         pointer-events: none;
     }
 
@@ -132,9 +128,8 @@ st.markdown(
         display: inline-block;
         font-size: 0.72rem;
         font-weight: 600;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: #C7CFFF;
+        letter-spacing: 0.04em;
+        color: #C7E0D0;
         margin-bottom: 0.7rem;
     }
 
@@ -152,7 +147,7 @@ st.markdown(
         font-style: italic;
         font-size: 1.18rem;
         line-height: 1.5;
-        color: rgba(255, 255, 255, 0.80);
+        color: rgba(255, 255, 255, 0.84);
         max-width: 52ch;
         margin-bottom: 1.3rem;
     }
@@ -170,7 +165,7 @@ st.markdown(
         color: rgba(255, 255, 255, 0.92);
         background: rgba(255, 255, 255, 0.12);
         border: 1px solid rgba(255, 255, 255, 0.18);
-        border-radius: 999px;
+        border-radius: 4px;
         padding: 0.28rem 0.75rem;
         backdrop-filter: blur(4px);
     }
@@ -215,24 +210,22 @@ st.markdown(
     .stat-card {
         background: var(--surface);
         border: 1px solid var(--line);
-        border-top: 3px solid var(--accent);
+        border-top: 1px solid var(--line);
         border-radius: var(--radius);
         padding: 1rem 1.15rem;
         min-height: 96px;
         box-shadow: var(--shadow-sm);
-        transition: transform 0.16s ease, box-shadow 0.16s ease;
+        transition: border-color 0.16s ease;
     }
 
     .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-md);
+        border-color: var(--accent-border);
     }
 
     .stat-label {
         font-size: 0.72rem;
         font-weight: 600;
-        letter-spacing: 0.09em;
-        text-transform: uppercase;
+        letter-spacing: 0.02em;
         color: var(--ink-faint);
         margin-bottom: 0.4rem;
     }
@@ -343,7 +336,7 @@ st.markdown(
         font-weight: 500;
         color: var(--accent-strong);
         background: var(--accent-soft);
-        border-radius: 999px;
+        border-radius: 4px;
         padding: 0.2rem 0.65rem;
         white-space: nowrap;
     }
@@ -353,7 +346,7 @@ st.markdown(
        ------------------------------------------------------------- */
 
     section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #FFFFFF 0%, var(--surface-2) 100%);
+        background: #E8EEE9;
         border-right: 1px solid var(--line);
     }
 
@@ -383,7 +376,7 @@ st.markdown(
         font-size: 0.72rem;
         font-weight: 600;
         letter-spacing: 0.11em;
-        text-transform: uppercase;
+        text-transform: none;
         color: var(--ink-faint);
         margin-bottom: 0.45rem;
     }
@@ -455,7 +448,7 @@ st.markdown(
         height: 7px;
         border-radius: 50%;
         background: currentColor;
-        animation: pulse 2.2s ease-in-out infinite;
+        animation: none;
     }
 
     /* -------------------------------------------------------------
@@ -578,8 +571,8 @@ st.markdown(
     }
 
     .stProgress > div > div > div > div {
-        background: linear-gradient(90deg, var(--accent), #7C8CF0);
-        border-radius: 999px;
+        background: var(--accent);
+        border-radius: 3px;
     }
 
     hr {
@@ -588,6 +581,24 @@ st.markdown(
 
     .stCaption, caption {
         color: var(--ink-faint);
+    }
+
+    /* Reading workspace refinements */
+    .stTextArea textarea { background: #FFFFFF; }
+    .answer-container { border-left-width: 2px; box-shadow: none; }
+    .citation-card { box-shadow: none; border-left: 2px solid var(--line-strong); }
+    .citation-card:hover { border-left-color: var(--accent); box-shadow: none; }
+    .stButton > button { border-radius: 6px; }
+    [data-testid="stFileDropZone"] { border-width: 1px; }
+    @media (max-width: 760px) {
+        .block-container { padding-top: 1rem; padding-left: 1rem; padding-right: 1rem; }
+        .masthead { padding: 1.5rem; }
+        .masthead-title { font-size: 2.25rem; }
+        .masthead-subtitle { font-size: 1.05rem; }
+        .answer-container { padding: 1rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
 
     </style>
@@ -1483,11 +1494,10 @@ def main():
     st.markdown(
         """
         <div class="masthead">
-            <div class="masthead-kicker">Retrieval-augmented reading</div>
+            <div class="masthead-kicker">Research paper workspace</div>
             <div class="masthead-title">Marginalia</div>
             <div class="masthead-subtitle">
-                Ask a paper what it means, and it will show you
-                exactly where it said so.
+                Ask a question. Read the answer alongside the passages that support it.
             </div>
             <div class="masthead-badges">
                 <span class="masthead-badge">BGE embeddings</span>
@@ -1504,26 +1514,24 @@ def main():
     # Upload
     # ---------------------------------------------------------------
 
-    render_upload_section()
+    upload_column, reading_column = st.columns([0.86, 1.5], gap="large")
 
-    # ---------------------------------------------------------------
-    # Question answering
-    # ---------------------------------------------------------------
+    with upload_column:
+        render_upload_section()
 
-    if st.session_state["uploaded_document"] is not None:
-
-        st.divider()
-
-        render_question_section()
-
-    else:
-
-        st.divider()
-
-        st.info(
-            "Your research workspace will appear here "
-            "after a document is processed."
-        )
+    with reading_column:
+        if st.session_state["uploaded_document"] is not None:
+            render_question_section()
+        else:
+            st.markdown(
+                '<div class="section-title">Your reading desk</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="section-description">Process a paper to ask questions and review its supporting passages here.</div>',
+                unsafe_allow_html=True,
+            )
+            st.info("Your answers and source passages will appear here.")
 
     # ---------------------------------------------------------------
     # Footer
